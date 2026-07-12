@@ -1,67 +1,115 @@
 :root {
+  /* 全体の文字や配色の基本設定 */
+  /* 文字の色の種類を明るい色に合わせる */
   color-scheme: light;
+  /* 文字の形をすこし見やすいものにする */
   font-family: "Segoe UI", sans-serif;
 }
 
 body {
+  /* 画面中央にゲームを置くための基本レイアウト */
+  /* 余白をなくして画面いっぱいに使えるようにする */
   margin: 0;
+  /* 画面の高さを最低でも見えるようにする */
   min-height: 100vh;
+  /* グリッドで真ん中に配置する */
   display: grid;
+  /* グリッドの中央に置く */
   place-items: center;
+  /* 背景を白にする */
   background: #ffffff;
+  /* 文字の色を黒にする */
   color: #111111;
 }
 
 .game-shell {
+  /* ゲーム画面を囲む外枠の見た目 */
+  /* 画面幅に合わせて幅を決める */
   width: min(92vw, 560px);
+  /* 内側の余白を大きめに取る */
   padding: 20px;
+  /* 背景を白にする */
   background: #ffffff;
+  /* 黒い線で囲む */
   border: 1px solid #111111;
 }
 
 h1 {
+  /* タイトルの見た目を整える */
+  /* 上下の余白をなくして見やすくする */
   margin: 0 0 8px;
+  /* 文字を少し大きくする */
   font-size: 1.4rem;
+  /* 文字の太さを普通にする */
   font-weight: 400;
 }
 
 .subtitle {
+  /* 説明文の色と大きさ */
+  /* 下に少し余白を作る */
   margin: 0 0 12px;
+  /* 文字を少しだけ薄い黒にする */
   color: #333333;
+  /* 文字を少し小さめにする */
   font-size: 0.95rem;
 }
 
 canvas {
+  /* ゲーム描画エリアのサイズと枠線 */
+  /* 横幅は親に合わせていっぱいにする */
   width: 100%;
+  /* 最大幅を480pxにする */
   max-width: 480px;
+  /* 高さは自動で合わせる */
   height: auto;
+  /* ブロックを並べる要素として表示する */
   display: block;
+  /* 黒い枠線をつける */
   border: 2px solid #111111;
+  /* 背景を白にする */
   background: #ffffff;
 }
 
 .info-row {
+  /* 得点と状態表示を横並びにする */
+  /* フレックスボックスで横並びにする */
   display: flex;
+  /* 左右にそれぞれ寄せる */
   justify-content: space-between;
+  /* 縦方向の中央に合わせる */
   align-items: center;
+  /* 要素同士の隙間を作る */
   gap: 8px;
+  /* 上下に余白を作る */
   margin: 12px 0;
+  /* 内側の余白を作る */
   padding: 8px 0;
+  /* 上下に線を引く */
   border-top: 1px solid #111111;
   border-bottom: 1px solid #111111;
+  /* 文字サイズを少し小さめにする */
   font-size: 0.95rem;
 }
 
 button {
+  /* リスタートボタンの見た目 */
+  /* 黒い線のボタンにする */
   border: 1px solid #111111;
+  /* ボタンの内側に余白を作る */
   padding: 8px 12px;
+  /* 文字サイズを少し小さめにする */
   font-size: 0.95rem;
+  /* カーソルを指にする */
   cursor: pointer;
+  /* 背景を白にする */
   background: #ffffff;
+  /* 文字色を黒にする */
   color: #111111;
 }
 
 button:hover {
+  /* ボタンにカーソルを乗せたときの見た目 */
+  /* 背景を黒にして文字を白にする */
   background: #111111;
   color: #ffffff;
 }
