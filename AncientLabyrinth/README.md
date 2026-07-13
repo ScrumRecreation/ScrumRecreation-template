@@ -1,4 +1,4 @@
-# Wizardly
+# AncientLabyrinth
 
 古代迷宮を探索し、宝物と秘門を目指すシンプルな迷宮探索RPGです。
 
