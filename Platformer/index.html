@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>横スクロールアクション</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="game-header">
+        <div class="title-block">
+          <p class="eyebrow">Canvas + JavaScript</p>
+          <h1>横スクロールアクション</h1>
+          <p class="subtitle">左右移動・ジャンプ・コイン・ゴールをつなぐ、少しだけ完成度の高いアクションゲームです。</p>
+        </div>
+        <div id="stageBadge" class="header-badge">Stage 1</div>
+      </header>
+
+      <div class="stage-row">
+        <div class="stage-label-group">
+          <span class="stage-label">ステージ</span>
+          <span id="stageName" class="stage-name">Forest Run</span>
+        </div>
+        <div class="stage-buttons">
+          <button class="stage-button active" data-stage="0">1</button>
+          <button class="stage-button" data-stage="1">2</button>
+          <button class="stage-button" data-stage="2">3</button>
+        </div>
+      </div>
+
+      <div class="canvas-frame">
+        <canvas id="gameCanvas" width="800" height="420"></canvas>
+      </div>
+
+      <div class="hud">
+        <div class="status-pill">スコア: <span id="score">0</span></div>
+        <div class="status-pill">残機: <span id="lives">3</span></div>
+        <div class="status-pill">状態: <span id="status">準備中</span></div>
+      </div>
+
+      <div class="controls-row">
+        <p class="controls">矢印キーまたは WASD で移動し、スペースでジャンプ。コインを集めてゴールへ進みましょう。</p>
+        <button id="restartButton">もう一度遊ぶ</button>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
