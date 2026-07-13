@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>横スクロールシューティング</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- ゲーム全体をまとめて表示する枠 -->
+    <main class="game-shell">
+      <!-- 画面上部のタイトルと説明 -->
+      <h1>横スクロールシューティング</h1>
+      <p class="subtitle">矢印キーで動かし、スペースで発射します。</p>
+
+      <!-- ゲーム本体を描画するキャンバス -->
+      <canvas id="gameCanvas" width="640" height="360"></canvas>
+
+      <!-- 得点と現在の状態を表示する部分 -->
+      <div class="info-row">
+        <div>得点: <span id="score">0</span></div>
+        <div id="status">スペースで開始</div>
+      </div>
+
+      <!-- もう一度遊ぶためのボタン -->
+      <button id="restartButton">もう一度遊ぶ</button>
+    </main>
+
+    <!-- ゲームの動きや描画を担当する JavaScript -->
+    <script src="script.js"></script>
+  </body>
+</html>

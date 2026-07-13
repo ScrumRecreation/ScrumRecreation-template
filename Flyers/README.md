@@ -34,5 +34,5 @@
 ---
 
 ### プロジェクト公開ページ
-*   [ブロック崩しゲームはこちら](https://keisaurem.github.io/ScrumRecreation/BrickBreaker/)
-*   [本プロジェクト告知チラシ](https://keisaurem.github.io/ScrumRecreation/Flyers/flyer.html)
+*   [ブロック崩しゲームはこちら](https://scrumrecreation.github.io/ScrumRecreation-template//BrickBreaker/)
+*   [本プロジェクト告知チラシ](https://scrumrecreation.github.io/ScrumRecreation-template/flyer.html)
