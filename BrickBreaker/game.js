@@ -16,6 +16,121 @@
   const { createInputController } = window.BB.input;
   const { createEmitter } = window.BB.events;
 
+  /*
+    効果音を出すためのとても小さな音の仕組みです。
+    ブラウザの Web Audio API を使って、短い音をその場で作ります。
+    音声ファイルを用意しなくても動くので、ゲームのたたき台に向いています。
+  */
+  function createSoundEngine(soundConfig) {
+    const enabled = soundConfig?.enabled !== false;
+    let audioContext = null;
+    let masterGain = null;
+    let compressor = null;
+
+    if (enabled && typeof window.AudioContext !== "undefined") {
+      audioContext = new window.AudioContext({ latencyHint: "interactive" });
+      masterGain = audioContext.createGain();
+      compressor = audioContext.createDynamicsCompressor();
+      masterGain.gain.value = 1;
+      compressor.threshold.value = -24;
+      compressor.knee.value = 18;
+      compressor.ratio.value = 8;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.12;
+      masterGain.connect(compressor);
+      compressor.connect(audioContext.destination);
+    }
+
+    function getContext() {
+      if (!enabled || typeof window.AudioContext === "undefined") {
+        return null;
+      }
+
+      if (!audioContext) {
+        audioContext = new window.AudioContext({ latencyHint: "interactive" });
+        masterGain = audioContext.createGain();
+        compressor = audioContext.createDynamicsCompressor();
+        masterGain.gain.value = 1;
+        compressor.threshold.value = -24;
+        compressor.knee.value = 18;
+        compressor.ratio.value = 8;
+        compressor.attack.value = 0.003;
+        compressor.release.value = 0.12;
+        masterGain.connect(compressor);
+        compressor.connect(audioContext.destination);
+      }
+
+      return audioContext;
+    }
+
+    function unlock() {
+      const context = getContext();
+      if (!context) {
+        return;
+      }
+
+      if (context.state === "suspended") {
+        context.resume().then(() => {
+          // ここで音の通り道を一度だけ鳴らして、初回の引っかかりを減らす。
+          const warmup = context.createOscillator();
+          const warmupGain = context.createGain();
+          warmup.frequency.value = 40;
+          warmup.type = "sine";
+          warmupGain.gain.value = 0.00001;
+          warmup.connect(warmupGain);
+          warmupGain.connect(masterGain);
+          warmup.start();
+          warmup.stop(context.currentTime + 0.03);
+        }).catch(() => {});
+      }
+    }
+
+    function playTone(name, delay = 0) {
+      const context = getContext();
+      if (!context) {
+        return;
+      }
+
+      const tone = soundConfig.tones[name];
+      if (!tone) {
+        return;
+      }
+
+      const startTime = context.currentTime + delay;
+      const duration = tone.duration ?? 0.08;
+      const endTime = startTime + duration;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = tone.type ?? "sine";
+      oscillator.frequency.setValueAtTime(tone.frequency ?? 440, startTime);
+      if (tone.endFrequency) {
+        oscillator.frequency.exponentialRampToValueAtTime(tone.endFrequency, endTime);
+      }
+
+      const volume = (soundConfig.masterVolume ?? 0.15) * (tone.volume ?? 0.5);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), startTime + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
+      oscillator.connect(gain);
+      gain.connect(masterGain ?? context.destination);
+      oscillator.start(startTime);
+      oscillator.stop(endTime + 0.03);
+    }
+
+    function play(name) {
+      playTone(name);
+    }
+
+    function playTwoTone(nameA, nameB) {
+      playTone(nameA);
+      playTone(nameB, 0.09);
+    }
+
+    return { unlock, play, playTwoTone };
+  }
+
 // ゲーム本体で使う要素をまとめて取得する。
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -59,6 +174,7 @@ const game = {
 };
 game.bricks = createBricks(CONFIG, CONFIG.stages[game.stageIndex]);
 game.ball = createBall(CONFIG, game.paddle);
+const sound = createSoundEngine(CONFIG.sound);
 
 /*
   「何が起きたか」を発行するだけの小さなイベントの仕組みです。
@@ -154,6 +270,8 @@ function hideOverlay() {
   もしゲームオーバーまたはクリア済みなら、初期化してから開始します。
 */
 function startGame() {
+  sound.unlock();
+
   if (game.phase === "playing") {
     return;
   }
@@ -164,6 +282,7 @@ function startGame() {
 
   hideOverlay();
   game.phase = "playing";
+  sound.play("start");
 }
 
 /*
@@ -176,6 +295,7 @@ function advanceStage() {
   if (game.stageIndex + 1 >= CONFIG.stages.length) {
     game.phase = "win";
     showOverlay("全ステージクリア！\nきみはラストまでたどり着いた！");
+    sound.playTwoTone("stageClear", "win");
     return false;
   }
 
@@ -187,6 +307,7 @@ function advanceStage() {
   game.phase = "ready";
   updateStageHud();
   showOverlay(`${CONFIG.stages[game.stageIndex].name}\nタップして続ける`);
+  sound.play("stageClear");
   return true;
 }
 
@@ -237,15 +358,18 @@ function updateBall() {
   if (ball.x - ball.size <= 0) {
     ball.x = ball.size;
     ball.vx *= -1;
+    sound.play("wallBounce");
   } else if (ball.x + ball.size >= CONFIG.width) {
     ball.x = CONFIG.width - ball.size;
     ball.vx *= -1;
+    sound.play("wallBounce");
   }
 
   // 上の壁に当たったら、縦方向の速度を反転します。
   if (ball.y - ball.size <= 0) {
     ball.y = ball.size;
     ball.vy *= -1;
+    sound.play("wallBounce");
   }
 
   // パドルに当たったかどうかを確認します。
@@ -268,6 +392,8 @@ function updateBall() {
     if (Math.abs(ball.vx) < CONFIG.ballMinHorizontalSpeed) {
       ball.vx = ball.vx < 0 ? -CONFIG.ballMinHorizontalSpeed : CONFIG.ballMinHorizontalSpeed;
     }
+
+    sound.play("paddleBounce");
   }
 
   // すべてのブロックを順に見て、当たっていたら壊します。
@@ -283,6 +409,7 @@ function updateBall() {
     brick.alive = false; // ブロックを壊れた状態にする（次のdrawBricksでは描かれなくなる）
     game.score += brick.score;
     events.emit("scoreChanged"); // 得点が変わったことを知らせる（HUDの表示が更新される）
+    sound.play("brickHit");
 
     // ボールがブロックの上下から来たのか、左右から来たのかを
     // めり込み量（重なっている量）の小さい方で判定し、
@@ -303,12 +430,14 @@ function updateBall() {
     if (game.lives <= 0) {
       game.phase = "over"; // 残機が0以下ならゲームオーバーの状態にする
       events.emit("gameOver");
+      sound.play("gameOver");
       return; // ここで処理を終える（ボールを作り直す必要がないため）
     }
 
     game.ball = createBall(CONFIG, paddle); // 残機が残っていれば、ボールをパドルの上に作り直す
     game.phase = "ready";                   // タップ/スペースキーで再開できる状態に戻す
     events.emit("lifeLost", "ライフを失った！\nタップして続ける");
+    sound.play("lifeLost");
   }
 
   // すべてのブロックがなくなったらクリアです。

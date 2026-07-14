@@ -42,6 +42,20 @@ window.BB.CONFIG = {
   // ゲーム進行設定
   initialLives: 3, // 初期ライフ数
   scorePerBrick: 10, // 1つのブロックを壊したときの得点
+  sound: {
+    enabled: true, // 効果音を使うかどうか
+    masterVolume: 0.22, // 全体の音量の土台
+    tones: {
+      start: { type: "sine", frequency: 660, endFrequency: 990, duration: 0.08, volume: 0.9 }, // ゲーム開始の音
+      paddleBounce: { type: "triangle", frequency: 300, endFrequency: 380, duration: 0.035, volume: 0.5 }, // パドルに当たった音
+      wallBounce: { type: "triangle", frequency: 360, endFrequency: 460, duration: 0.03, volume: 0.35 }, // 壁に当たった音
+      brickHit: { type: "square", frequency: 600, endFrequency: 280, duration: 0.045, volume: 0.55 }, // ブロックを壊した音
+      lifeLost: { type: "sawtooth", frequency: 180, endFrequency: 95, duration: 0.14, volume: 0.55 }, // ライフを失った音
+      gameOver: { type: "sawtooth", frequency: 150, endFrequency: 75, duration: 0.2, volume: 0.7 }, // ゲームオーバーの音
+      stageClear: { type: "sine", frequency: 523.25, endFrequency: 880, duration: 0.12, volume: 0.7 }, // ステージクリアの音
+      win: { type: "sine", frequency: 523.25, endFrequency: 1174.66, duration: 0.22, volume: 0.85 } // 全ステージクリアの音
+    }
+  },
   /*
     ステージは「この順番で遊ぶ問題集」のようなものです。
     1つのステージには、
