@@ -38,6 +38,11 @@
       border: 1px solid #d7dce5;
     }
 
+    .sheet.page-1 {
+      page-break-after: always;
+      break-after: page;
+    }
+
     .title {
       font-size: 22px;
       font-weight: 700;
@@ -98,14 +103,26 @@
     }
 
     .write-box {
-      min-height: 20mm;
+      min-height: 30mm;
       padding: 8px;
       background-image: linear-gradient(to bottom, transparent 96%, #eef2f8 96%);
       background-size: 100% 9mm;
     }
 
     .write-box.tall {
-      min-height: 32mm;
+      min-height: 48mm;
+    }
+
+    .write-box.medium {
+      min-height: 38mm;
+    }
+
+    .page-1 .write-box.medium {
+      min-height: 56mm;
+    }
+
+    .page-1 .write-box.tall {
+      min-height: 70mm;
     }
 
     .footer-note {
@@ -125,13 +142,18 @@
         margin: 0;
         border: none;
         width: auto;
-        min-height: auto;
+        min-height: 297mm;
+      }
+
+      .sheet.page-1 {
+        page-break-after: always;
+        break-after: page;
       }
     }
   </style>
 </head>
 <body>
-  <main class="sheet">
+  <main class="sheet page-1">
     <h1 class="title">🛠 仕様定義書（印刷用）</h1>
 
     <section class="meta-grid">
@@ -152,7 +174,7 @@
     <section class="section">
       <h2>1) いつ動く？（TRIGGER）</h2>
       <p class="hint">短く書く: いつこの機能が始まるか</p>
-      <div class="write-box"></div>
+      <div class="write-box medium"></div>
     </section>
 
     <section class="section">
@@ -164,19 +186,22 @@
     <section class="section">
       <h2>3) どんな条件がある？（CONDITION）</h2>
       <p class="hint">例外や特別ルールを3つ以内で</p>
-      <div class="write-box"></div>
+      <div class="write-box medium"></div>
     </section>
+  </main>
+
+  <main class="sheet">
 
     <section class="section">
       <h2>4) 画面に何が表示される？（表示／UI）</h2>
       <p class="hint">画面で見えることだけを書く（文字、色、場所、表示時間）</p>
-      <div class="write-box"></div>
+      <div class="write-box medium"></div>
     </section>
 
     <section class="section">
       <h2>5) プレイヤーの操作（INPUT）</h2>
       <p class="hint">キー、クリック、タップなど</p>
-      <div class="write-box"></div>
+      <div class="write-box medium"></div>
     </section>
 
     <section class="section">
@@ -188,7 +213,7 @@
     <section class="section">
       <h2>7) 備考（メモ）</h2>
       <p class="hint">追加で伝えたいこと</p>
-      <div class="write-box"></div>
+      <div class="write-box medium"></div>
     </section>
 
     <section class="footer-note">必要なら、このテンプレートをコピーして複数枚使ってください。</section>
