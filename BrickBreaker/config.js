@@ -61,7 +61,7 @@ window.BB.CONFIG = {
       ブロックの並びも少しだけ空きマスを入れて、最初は取り組みやすくしています。
     */
     {
-      name: "Stage 1",
+      name: "はじめのチャレンジ",
       // difficulty は、このステージをどれくらい難しくするかをまとめた設定です。
       // 数字をばらばらに置かず、1つの箱に入れておくと、
       // 後から「このステージだけパドルを短くする」などの調整がしやすくなります。
@@ -95,7 +95,7 @@ window.BB.CONFIG = {
       こうすると、ステージが進んだことが見た目でもわかります。
     */
     {
-      name: "Stage 2",
+      name: "スピードアップ",
       difficulty: {
         paddleWidth: 84,
         paddleSpeed: 7,
@@ -116,7 +116,7 @@ window.BB.CONFIG = {
       ここが現時点でのゴールになります。
     */
     {
-      name: "Stage 3",
+      name: "ラストアタック",
       difficulty: {
         paddleWidth: 76,
         paddleSpeed: 6,

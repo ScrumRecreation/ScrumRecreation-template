@@ -19,6 +19,23 @@ function drawBackground(ctx, CONFIG) {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, CONFIG.width, CONFIG.height); // 画面全体をそのグラデーションで塗る
 
+  const t = Date.now() / 1000;
+  const orbs = [
+    { x: 48 + Math.sin(t * 0.6) * 8, y: 82 + Math.cos(t * 0.8) * 6, r: 88, color: "rgba(116,247,255,0.18)" },
+    { x: CONFIG.width - 56 + Math.cos(t * 0.7) * 10, y: 150 + Math.sin(t * 0.9) * 8, r: 104, color: "rgba(255,209,102,0.12)" },
+    { x: CONFIG.width / 2, y: CONFIG.height - 72 + Math.sin(t * 0.5) * 8, r: 120, color: "rgba(157,248,127,0.08)" }
+  ];
+
+  for (const orb of orbs) {
+    const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
+    gradient.addColorStop(0, orb.color);
+    gradient.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   // 画面に少しだけ線を入れて、奥行きを出します。
   ctx.save();
   ctx.strokeStyle = "rgba(255,255,255,0.08)"; // うすく見える白い線
@@ -42,10 +59,22 @@ function drawBricks(ctx, bricks) {
       continue; // 壊れたブロックは描かずに次のブロックへ
     }
 
+    ctx.save();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = brick.color;
     ctx.fillStyle = brick.color;
     ctx.fillRect(brick.x, brick.y, brick.width, brick.height); // ブロックの本体を塗る
+
+    const topHighlight = ctx.createLinearGradient(brick.x, brick.y, brick.x, brick.y + brick.height);
+    topHighlight.addColorStop(0, "rgba(255,255,255,0.28)");
+    topHighlight.addColorStop(0.3, "rgba(255,255,255,0.08)");
+    topHighlight.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = topHighlight;
+    ctx.fillRect(brick.x, brick.y, brick.width, brick.height * 0.45);
+
     ctx.strokeStyle = "rgba(255,255,255,0.2)";
     ctx.strokeRect(brick.x, brick.y, brick.width, brick.height); // 縁取りの線を描く
+    ctx.restore();
   }
 }
 
@@ -60,6 +89,12 @@ function drawPaddle(ctx, paddle, CONFIG) {
   ctx.shadowColor = CONFIG.colors.glow;
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
   ctx.shadowBlur = 0;              // 光る効果を元に戻す（他の描画に影響しないように）
+
+  const paddleGlow = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.height);
+  paddleGlow.addColorStop(0, "rgba(255,255,255,0.35)");
+  paddleGlow.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = paddleGlow;
+  ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height * 0.45);
 }
 
 /*
@@ -69,7 +104,15 @@ function drawPaddle(ctx, paddle, CONFIG) {
 function drawBall(ctx, ball, CONFIG) {
   ctx.beginPath();
   ctx.fillStyle = CONFIG.colors.ball;
+  ctx.shadowBlur = 16;
+  ctx.shadowColor = CONFIG.colors.ball;
   ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2); // 中心(ball.x, ball.y)、半径ball.sizeの円を描く
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.arc(ball.x - 2, ball.y - 2, Math.max(1.5, ball.size * 0.22), 0, Math.PI * 2);
   ctx.fill();
 }
 

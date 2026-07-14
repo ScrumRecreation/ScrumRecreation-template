@@ -21,6 +21,9 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
 const livesEl = document.getElementById("lives");
+const stageBadgeEl = document.getElementById("stageBadge");
+const stageNameEl = document.getElementById("stageName");
+const stageProgressEl = document.getElementById("stageProgress");
 const overlay = document.getElementById("overlay");
 const overlayText = document.getElementById("overlayText");
 const restartBtn = document.getElementById("restartBtn");
@@ -85,8 +88,9 @@ function initGame() {
   game.ball = createBall(CONFIG, game.paddle);
   game.phase = "ready";
 
+  updateStageHud();
   updateHud();
-  showOverlay("タップしてスタート");
+  showOverlay("タップしてスタート\n3ステージ全部に挑戦しよう");
   draw();
 }
 
@@ -103,6 +107,19 @@ function applyStageSettings(stage) {
   CONFIG.ballSpeed = stage.difficulty.ballSpeed;
   CONFIG.ballBoostOnHit = stage.difficulty.ballBoostOnHit;
   CONFIG.ballMinHorizontalSpeed = stage.difficulty.ballMinHorizontalSpeed;
+}
+
+/*
+  いま何面目かを画面に見せる関数です。
+  数字だけでなくステージ名も出すことで、「次はどんな面かな」と思いやすくします。
+*/
+function updateStageHud() {
+  const currentStage = CONFIG.stages[game.stageIndex];
+  const stageNumber = game.stageIndex + 1;
+  const totalStages = CONFIG.stages.length;
+  stageBadgeEl.textContent = `${stageNumber} / ${totalStages}`;
+  stageNameEl.textContent = currentStage.name;
+  stageProgressEl.style.width = `${(stageNumber / totalStages) * 100}%`;
 }
 
 /*
@@ -158,7 +175,7 @@ function startGame() {
 function advanceStage() {
   if (game.stageIndex + 1 >= CONFIG.stages.length) {
     game.phase = "win";
-    showOverlay("全ステージクリア！\nもういちど遊ぼう");
+    showOverlay("全ステージクリア！\nきみはラストまでたどり着いた！");
     return false;
   }
 
@@ -168,6 +185,7 @@ function advanceStage() {
   game.paddle = createPaddle(CONFIG);
   game.ball = createBall(CONFIG, game.paddle);
   game.phase = "ready";
+  updateStageHud();
   showOverlay(`${CONFIG.stages[game.stageIndex].name}\nタップして続ける`);
   return true;
 }

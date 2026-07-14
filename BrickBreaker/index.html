@@ -25,17 +25,34 @@
         ここに HUD（点数や残機）とキャンバスを並べます。
       -->
       <section class="game-card">
+        <header class="game-header">
+          <div class="title-block">
+            <p class="eyebrow">WORKSHOP BUILD</p>
+            <h1>BrickBreaker</h1>
+            <p class="subtitle">見た目でひきつけて、遊びながら少しずつ強くなるたたき台です。</p>
+          </div>
+          <div class="stage-card" aria-live="polite">
+            <span class="stage-label">STAGE</span>
+            <strong id="stageBadge">1 / 3</strong>
+            <span id="stageName">準備中</span>
+          </div>
+        </header>
+
         <!-- 得点と残機を表示する部分です。 -->
         <div class="hud">
           <div class="stat">
-            <span>Score</span>
+            <span>スコア</span>
             <!-- JavaScript から中身を更新するための ID です。aria-live で得点変化を読み上げさせます。 -->
             <strong id="score" aria-live="polite">0</strong>
           </div>
           <div class="stat">
-            <span>Lives</span>
+            <span>ライフ</span>
             <strong id="lives" aria-live="polite">3</strong>
           </div>
+        </div>
+
+        <div class="stage-progress" aria-hidden="true">
+          <div id="stageProgress" class="stage-progress-fill"></div>
         </div>
 
         <!--
@@ -59,8 +76,8 @@
 
         <!-- 下部の操作説明と再スタートボタンです。 -->
         <div class="controls">
-          <p>左右に動かして、ボールをブロックに当てよう。</p>
-          <button id="restartBtn" type="button">もういちど</button>
+          <p>左右に動かして、ブロックを全部こわそう。</p>
+          <button id="restartBtn" type="button">もう一度チャレンジ</button>
         </div>
       </section>
     </main>
