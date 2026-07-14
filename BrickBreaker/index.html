@@ -1,32 +1,84 @@
 <!DOCTYPE html>
+<!--
+  このファイルは、ゲームの見た目を組み立てる土台です。
+  HTMLは「何を画面に出すか」を決める役割があり、
+  ここではタイトル、点数、キャンバス、スタート画面、ボタンを配置しています。
+-->
 <html lang="ja">
   <head>
+    <!-- 文字コードを日本語向けに設定します。 -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Brick Breaker</title>
+    <!-- スマートフォンで見たときに画面サイズに合わせて表示するための設定です。 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>BrickBreaker</title>
+    <!-- 見た目を整える CSS を読み込みます。 -->
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <!-- ゲーム全体をまとめて表示する枠 -->
-    <main class="game-shell">
-      <!-- 画面上部のタイトルと説明 -->
-      <h1>ブロック崩し</h1>
-      <p class="subtitle">矢印キーで動かし、スペースで始めます。</p>
+    <!--
+      全体のレイアウトをまとめるためのコンテナです。
+      画面の中央にゲームカードが表示されるようにしています。
+    -->
+    <main class="app-shell">
+      <!--
+        ゲーム本体を囲むカードです。
+        ここに HUD（点数や残機）とキャンバスを並べます。
+      -->
+      <section class="game-card">
+        <!-- 得点と残機を表示する部分です。 -->
+        <div class="hud">
+          <div class="stat">
+            <span>Score</span>
+            <!-- JavaScript から中身を更新するための ID です。aria-live で得点変化を読み上げさせます。 -->
+            <strong id="score" aria-live="polite">0</strong>
+          </div>
+          <div class="stat">
+            <span>Lives</span>
+            <strong id="lives" aria-live="polite">3</strong>
+          </div>
+        </div>
 
-      <!-- ゲーム本体を描画するキャンバス -->
-      <canvas id="gameCanvas" width="480" height="360"></canvas>
+        <!--
+          ゲーム画面そのものです。
+          Canvas は JavaScript で絵を描くための場所です。
+        -->
+        <div class="canvas-wrap">
+          <!-- 実際のゲーム描画先です。幅と高さを指定しています。 -->
+          <canvas id="gameCanvas" width="360" height="520"></canvas>
+          <!--
+            ゲーム開始前やゲームオーバー時に表示するオーバーレイです。
+            ここに「タップしてスタート」などのメッセージを出します。
+          -->
+          <div id="overlay" class="overlay">
+            <div class="overlay-card">
+              <h1>BrickBreaker</h1>
+              <p id="overlayText" aria-live="assertive">タップしてスタート</p>
+            </div>
+          </div>
+        </div>
 
-      <!-- 得点と現在の状態を表示する部分 -->
-      <div class="info-row">
-        <div>得点: <span id="score">0</span></div>
-        <div id="status">スペースで開始</div>
-      </div>
-
-      <!-- もう一度遊ぶためのボタン -->
-      <button id="restartButton">もう一度遊ぶ</button>
+        <!-- 下部の操作説明と再スタートボタンです。 -->
+        <div class="controls">
+          <p>左右に動かして、ボールをブロックに当てよう。</p>
+          <button id="restartBtn" type="button">もういちど</button>
+        </div>
+      </section>
     </main>
 
-    <!-- ゲームの動きや描画を担当する JavaScript -->
-    <script src="script.js"></script>
+    <!--
+      通常の <script> タグで読み込みます（ES Modules は使いません）。
+      file:// で直接開いた場合でも、ブラウザの CORS 制限に
+      引っかからずに動かせるようにするためです。
+      各ファイルは window.BB という名前空間に自分の機能を公開し、
+      あとから読み込むファイルがそれを利用する仕組みなので、
+      読み込む順番（設定 → 部品 → まとめ役）が大切です。
+    -->
+    <script src="config.js"></script>
+    <script src="collision.js"></script>
+    <script src="entities.js"></script>
+    <script src="render.js"></script>
+    <script src="input.js"></script>
+    <script src="events.js"></script>
+    <script src="game.js"></script>
   </body>
 </html>

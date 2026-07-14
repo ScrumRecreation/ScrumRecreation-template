@@ -1,115 +1,253 @@
+/*
+  この CSS は、ゲーム画面の見た目を整えるためのルール集です。
+  ここでは色、余白、レイアウト、ボタンの見た目などを決めています。
+  変数 (:root) を使うと、色を一元管理しやすくなります。
+*/
 :root {
-  /* 全体の文字や配色の基本設定 */
-  /* 文字の色の種類を明るい色に合わせる */
-  color-scheme: light;
-  /* 文字の形をすこし見やすいものにする */
-  font-family: "Segoe UI", sans-serif;
+  /* ダークな雰囲気を作るための基本色です。 */
+  color-scheme: dark;
+  /* 画面全体の背景色です。 */
+  --bg: #060816;
+  /* ゲームカードの背景色です。 */
+  --panel: rgba(8, 15, 35, 0.9);
+  /* 目立つ青緑のアクセント色です。 */
+  --accent: #74f7ff;
+  /* 文字色です。 */
+  --text: #f5f7ff;
+  /* 少し薄い色の文字です。 */
+  --muted: #8ea2c4;
 }
 
+/*
+  すべての要素に box-sizing を適用して、
+  padding や border を含めたサイズ計算にします。
+  これにより、レイアウトが崩れにくくなります。
+*/
+* {
+  box-sizing: border-box;
+}
+
+/*
+  body はページ全体の土台です。
+  画面の中央にゲームを置くために、Grid レイアウトを使っています。
+*/
 body {
-  /* 画面中央にゲームを置くための基本レイアウト */
-  /* 余白をなくして画面いっぱいに使えるようにする */
   margin: 0;
-  /* 画面の高さを最低でも見えるようにする */
   min-height: 100vh;
-  /* グリッドで真ん中に配置する */
+  font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+  /* 放射状のグラデーションで、モダンな雰囲気を作ります。 */
+  background: radial-gradient(circle at top, #18325f 0%, var(--bg) 55%, #03050b 100%);
+  color: var(--text);
   display: grid;
-  /* グリッドの中央に置く */
   place-items: center;
-  /* 背景を白にする */
-  background: #ffffff;
-  /* 文字の色を黒にする */
-  color: #111111;
+  padding: 16px;
 }
 
-.game-shell {
-  /* ゲーム画面を囲む外枠の見た目 */
-  /* 画面幅に合わせて幅を決める */
-  width: min(92vw, 560px);
-  /* 内側の余白を大きめに取る */
-  padding: 20px;
-  /* 背景を白にする */
-  background: #ffffff;
-  /* 黒い線で囲む */
-  border: 1px solid #111111;
+/*
+  アプリ全体の横幅を制限します。
+  画面が広いときは 460px くらいに収め、
+  それ以上は広がりすぎないようにします。
+*/
+.app-shell {
+  width: min(100%, 460px);
 }
 
-h1 {
-  /* タイトルの見た目を整える */
-  /* 上下の余白をなくして見やすくする */
-  margin: 0 0 8px;
-  /* 文字を少し大きくする */
-  font-size: 1.4rem;
-  /* 文字の太さを普通にする */
-  font-weight: 400;
+/*
+  ゲームカードです。
+  背景、角丸、影、境界線を付けて、
+  画面の中でゲームが立ち上がるように見せています。
+*/
+.game-card {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
 }
 
-.subtitle {
-  /* 説明文の色と大きさ */
-  /* 下に少し余白を作る */
-  margin: 0 0 12px;
-  /* 文字を少しだけ薄い黒にする */
-  color: #333333;
-  /* 文字を少し小さめにする */
-  font-size: 0.95rem;
-}
-
-canvas {
-  /* ゲーム描画エリアのサイズと枠線 */
-  /* 横幅は親に合わせていっぱいにする */
-  width: 100%;
-  /* 最大幅を480pxにする */
-  max-width: 480px;
-  /* 高さは自動で合わせる */
-  height: auto;
-  /* ブロックを並べる要素として表示する */
-  display: block;
-  /* 黒い枠線をつける */
-  border: 2px solid #111111;
-  /* 背景を白にする */
-  background: #ffffff;
-}
-
-.info-row {
-  /* 得点と状態表示を横並びにする */
-  /* フレックスボックスで横並びにする */
+/*
+  スコアと残機の表示部分です。
+  左右に並べるために flex を使っています。
+*/
+.hud {
   display: flex;
-  /* 左右にそれぞれ寄せる */
   justify-content: space-between;
-  /* 縦方向の中央に合わせる */
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/*
+  1つ1つの表示ボックスです。
+  背景を少し明るくして、数字が目立つようにしています。
+*/
+.stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  /* 要素同士の隙間を作る */
-  gap: 8px;
-  /* 上下に余白を作る */
-  margin: 12px 0;
-  /* 内側の余白を作る */
-  padding: 8px 0;
-  /* 上下に線を引く */
-  border-top: 1px solid #111111;
-  border-bottom: 1px solid #111111;
-  /* 文字サイズを少し小さめにする */
+}
+
+/*
+  ラベルの文字です。
+  少し薄い色にして、数字よりも控えめに見せています。
+*/
+.stat span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/*
+  数字そのものです。
+  ここは少し太めにして、目立たせます。
+*/
+.stat strong {
+  font-size: 1.1rem;
+}
+
+/*
+  Canvas を入れる外側の箱です。
+  position: relative を付けることで、
+  オーバーレイを Canvas の上に重ねられるようにしています。
+*/
+.canvas-wrap {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/*
+  実際の描画先です。
+  display: block を指定して、下に余白が出ないようにしています。
+  touch-action: none を付けることで、タッチ操作時にページが勝手にスクロールされないようにします。
+*/
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: linear-gradient(180deg, #12213d 0%, #0a1022 100%);
+  touch-action: none;
+  /* 長押しやドレーギでテキスト選択セービーが出ないようにする。 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/*
+  開始前や終了時に表示する半透明の覆いです。
+  絶対配置にしてキャンバスの上にかぶせています。
+*/
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 6, 16, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+/*
+  JavaScript から hidden クラスを付け外しして、
+  表示・非表示を切り替えます。
+*/
+.overlay.hidden {
+  display: none;
+}
+
+/*
+  オーバーレイの中のカードです。
+  角丸と背景で、メッセージが読みやすいようにしています。
+*/
+.overlay-card {
+  text-align: center;
+  padding: 24px 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/*
+  タイトル文字です。
+  見出しなので少し大きめにしています。
+*/
+.overlay-card h1 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+/*
+  オーバーレイの本文です。
+  改行が入ることがあるため、pre-line を使って見やすくしています。
+*/
+.overlay-card p {
+  margin: 0;
+  color: var(--accent);
+  white-space: pre-line;
+}
+
+/*
+  操作説明とボタンを横に並べるための部分です。
+*/
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/*
+  説明文です。
+  少し薄い色にして、ボタンより目立たないようにしています。
+*/
+.controls p {
+  margin: 0;
+  color: var(--muted);
   font-size: 0.95rem;
 }
 
+/*
+  もういちどボタンです。
+  角丸で丸みを出し、グラデーションでポップ感を持たせています。
+*/
 button {
-  /* リスタートボタンの見た目 */
-  /* 黒い線のボタンにする */
-  border: 1px solid #111111;
-  /* ボタンの内側に余白を作る */
-  padding: 8px 12px;
-  /* 文字サイズを少し小さめにする */
-  font-size: 0.95rem;
-  /* カーソルを指にする */
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+  color: #02111b;
+  background: linear-gradient(135deg, var(--accent), #9bf1ff 85%);
   cursor: pointer;
-  /* 背景を白にする */
-  background: #ffffff;
-  /* 文字色を黒にする */
-  color: #111111;
+  /* ボタンを連打してもダブレタップでズームしないようにする。 */
+  touch-action: manipulation;
 }
 
-button:hover {
-  /* ボタンにカーソルを乗せたときの見た目 */
-  /* 背景を黒にして文字を白にする */
-  background: #111111;
-  color: #ffffff;
+/*
+  ボタンを押したときに少し縮むようにして、
+  クリック感を出しています。
+*/
+button:active {
+  transform: scale(0.98);
+}
+
+/*
+  スマートフォンでは下部のレイアウトを縦並びにして、
+  ボタンが画面幅に収まるようにしています。
+*/
+@media (max-width: 480px) {
+  .game-card {
+    padding: 14px;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button {
+    width: 100%;
+  }
 }

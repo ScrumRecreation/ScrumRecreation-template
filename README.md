@@ -51,10 +51,6 @@
     - `Issues`タブと`Pull requests`タブで該当するスレッドを確認してください（例: https://github.com/scrumrecreation/ScrumRecreation-template/issues、https://github.com/scrumrecreation/ScrumRecreation-template/pulls）。
 - 作成したゲーム（例）
     - ブロック崩しゲーム: https://scrumrecreation.github.io/ScrumRecreation-template/BrickBreaker/
-    - シューティングゲーム: https://scrumrecreation.github.io/ScrumRecreation-template/SideScrollerShooter/
-    - 横スクロールアクション: https://scrumrecreation.github.io/ScrumRecreation-template/Platformer/
-    - 疑似3D探索RPGゲーム: https://scrumrecreation.github.io/ScrumRecreation-template/AncientLabyrinth/
-
 --- 
 
 ## Projects Overview
@@ -62,16 +58,7 @@
 各サンプルは、ワークショップでの「自由に作って試す楽しさ」と「見た目の派手さ（プレゼン性）」を両立するために設計されています。コードの細部というより、どこまで自由に改変して良いかを判断し、短いスプリントで改善を回す体験を重視します。
 
 - **BrickBreaker/** — 最小限のブロック崩しの骨組み
-    - 役割: 実装が最小に抑えられており、「どう見ても改善点だらけ」なので、自由にルールや演出を追加して「どこまで面白くできるか」「自分の理想を形にするか」を試すのに最適です。
-
-- **SideScrollerShooter/** — 最小限のシューティングゲームの骨組み
-    - 役割: ブロック崩しと同じです。より好みのほうを題材にします。
-
-- **Platformer/** — 横スクロールアクション
-    - 役割: 上のブロック崩し・シューティングゲームと、下のRPGの間ものの中間に位置します。バランスがよく、なじみ深いゲームデザインのため、問題発見が捗りやすいです。
-
-- **AncientLabyrinth/** — 疑似3D一人称RPG
-    - 役割: 基本機能はそのままに“パラメータ調整”“見た目の演出強化（ライト／UI）”“ゲームバランス調整”を主体にします。自由度は低いですが、より完成度が高いゲームになるため、成果物に対する満足度が得られやすいです。
+    - 役割: 実装が最小に抑えられており、ゲームシステムもわかりやすいため、自由にルールや演出を追加して「どこまで面白くできるか」「自分の理想を形にするか」を試すのに最適です。
 
 各プロジェクトとも「まず小さく動くものを作る」「見た目で魅せる改善を短時間で試す」「結果をプレイテストして次の改善を決める」というサイクルを回すことが狙いです。ワークショップ向けに短いタスク例やプレイテストチェックリストを追加できます。希望があれば作成します。
 
