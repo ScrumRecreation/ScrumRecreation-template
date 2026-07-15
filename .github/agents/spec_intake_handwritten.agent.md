@@ -34,7 +34,12 @@ argument-hint: "Provide a scanned/photographed handwritten spec (or OCR text) an
   - 【候補】: （候補1 / 候補2）
   - 【理由】: （文字がつぶれている、文脈が曖昧、など）
 
-3. **最小確認質問（必要時のみ）**
+3. **補完ログのファイル保管（補完時は必須）**
+- 読み取り補完または入力補完を行った場合、必ず `Specs/Assumptions/` 配下に補完ログを保存する。
+- ファイル名は `YYYYMMDD_HHMM_<topic>_intake-assumptions.md` とする。
+- 記載項目は次を必須とする: 元入力（画像/PDF/OCR）、補完内容、理由、要確認事項。
+
+4. **最小確認質問（必要時のみ）**
 - 実装に必須の不足情報がある場合のみ、最大3問まで質問を出す。
 - 例: 数値（秒・点数・上限値）が抜けている場合
 
