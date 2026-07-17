@@ -131,6 +131,96 @@
     return { unlock, play, playTwoTone };
   }
 
+  /*
+    ブロック探索を軽くするための「空間インデックス」を作る関数です。
+    すべてのブロックを毎回なめる代わりに、
+    画面を小さなセル（升目）に区切って、
+    「どのセルにどのブロックがいるか」を前計算しておきます。
+
+    こうしておくと、当たり判定のときは
+    ボール周辺セルにいる候補だけを見ればよくなり、
+    ブロック数が多いときほど効果が出ます。
+
+    返り値:
+    - cellSize: 1セルの大きさ
+    - buckets: "cx:cy" をキーに、ブロック配列の添字一覧を持つ Map
+  */
+  function buildBrickSpatialIndex(bricks) {
+    if (!bricks.length) {
+      return null;
+    }
+
+    const sample = bricks[0];
+    const cellSize = Math.max(8, Math.floor(Math.max(sample.width, sample.height) * 2));
+    const buckets = new Map();
+
+    for (let i = 0; i < bricks.length; i += 1) {
+      const brick = bricks[i];
+      const startX = Math.floor(brick.x / cellSize);
+      const endX = Math.floor((brick.x + brick.width) / cellSize);
+      const startY = Math.floor(brick.y / cellSize);
+      const endY = Math.floor((brick.y + brick.height) / cellSize);
+
+      for (let cy = startY; cy <= endY; cy += 1) {
+        for (let cx = startX; cx <= endX; cx += 1) {
+          const key = `${cx}:${cy}`;
+          if (!buckets.has(key)) {
+            buckets.set(key, []);
+          }
+          buckets.get(key).push(i);
+        }
+      }
+    }
+
+    return { cellSize, buckets };
+  }
+
+  /*
+    いまのボール位置に近いセルだけを参照して、
+    当たり判定候補のブロック配列を返す関数です。
+
+    ボールの外接四角形（中心 ± 半径）からセル範囲を求め、
+    そのセルに登録されているブロックだけを候補にします。
+    複数セルにまたがって同じブロックが見つかることがあるので、
+    Set で重複を取り除いてから返します。
+
+    index がない場合（ブロック0個など）は、
+    安全側に倒して元のブロック配列をそのまま返します。
+  */
+  function getNearbyBricks(index, bricks, ball) {
+    if (!index) {
+      return bricks;
+    }
+
+    const { cellSize, buckets } = index;
+    const startX = Math.floor((ball.x - ball.size) / cellSize);
+    const endX = Math.floor((ball.x + ball.size) / cellSize);
+    const startY = Math.floor((ball.y - ball.size) / cellSize);
+    const endY = Math.floor((ball.y + ball.size) / cellSize);
+
+    const seen = new Set();
+    const candidates = [];
+    for (let cy = startY; cy <= endY; cy += 1) {
+      for (let cx = startX; cx <= endX; cx += 1) {
+        const key = `${cx}:${cy}`;
+        const bucket = buckets.get(key);
+        if (!bucket) {
+          continue;
+        }
+
+        for (const idx of bucket) {
+          if (seen.has(idx)) {
+            continue;
+          }
+          seen.add(idx);
+          candidates.push(bricks[idx]);
+        }
+      }
+    }
+
+    return candidates;
+  }
+
 // ゲーム本体で使う要素をまとめて取得する。
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -162,6 +252,10 @@ ctx.scale(pixelRatio, pixelRatio);
   playing = ゲーム中
   over = ゲームオーバー
   win = クリア
+
+  最適化用の状態として、次の2つも持たせる。
+  - brickSpatialIndex: 近傍探索を高速化するための空間インデックス
+  - aliveBricks: まだ壊れていないブロック数（毎フレーム全走査を避けるため）
 */
 const game = {
   phase: "ready",
@@ -170,9 +264,13 @@ const game = {
   lives: CONFIG.initialLives,
   paddle: createPaddle(CONFIG),
   ball: null,
-  bricks: []
+  bricks: [],
+  brickSpatialIndex: null,
+  aliveBricks: 0
 };
 game.bricks = createBricks(CONFIG, CONFIG.stages[game.stageIndex]);
+game.brickSpatialIndex = buildBrickSpatialIndex(game.bricks);
+game.aliveBricks = game.bricks.length;
 game.ball = createBall(CONFIG, game.paddle);
 const sound = createSoundEngine(CONFIG.sound);
 
@@ -200,6 +298,8 @@ function initGame() {
   game.lives = CONFIG.initialLives;
   applyStageSettings(CONFIG.stages[game.stageIndex]);
   game.bricks = createBricks(CONFIG, CONFIG.stages[game.stageIndex]);
+  game.brickSpatialIndex = buildBrickSpatialIndex(game.bricks);
+  game.aliveBricks = game.bricks.length;
   game.paddle = createPaddle(CONFIG);
   game.ball = createBall(CONFIG, game.paddle);
   game.phase = "ready";
@@ -302,6 +402,8 @@ function advanceStage() {
   game.stageIndex += 1;
   applyStageSettings(CONFIG.stages[game.stageIndex]);
   game.bricks = createBricks(CONFIG, CONFIG.stages[game.stageIndex]);
+  game.brickSpatialIndex = buildBrickSpatialIndex(game.bricks);
+  game.aliveBricks = game.bricks.length;
   game.paddle = createPaddle(CONFIG);
   game.ball = createBall(CONFIG, game.paddle);
   game.phase = "ready";
@@ -397,7 +499,8 @@ function updateBall() {
   }
 
   // すべてのブロックを順に見て、当たっていたら壊します。
-  for (const brick of bricks) {
+  const nearbyBricks = getNearbyBricks(game.brickSpatialIndex, bricks, ball);
+  for (const brick of nearbyBricks) {
     if (!brick.alive) {
       continue; // すでに壊れているブロックは調べずに次へ進む
     }
@@ -407,6 +510,7 @@ function updateBall() {
     }
 
     brick.alive = false; // ブロックを壊れた状態にする（次のdrawBricksでは描かれなくなる）
+    game.aliveBricks -= 1;
     game.score += brick.score;
     events.emit("scoreChanged"); // 得点が変わったことを知らせる（HUDの表示が更新される）
     sound.play("brickHit");
@@ -441,8 +545,7 @@ function updateBall() {
   }
 
   // すべてのブロックがなくなったらクリアです。
-  const allCleared = bricks.every((brick) => !brick.alive);
-  if (allCleared) {
+  if (game.aliveBricks <= 0) {
     const advanced = advanceStage();
     if (!advanced && game.phase === "win") {
       events.emit("gameWin");
