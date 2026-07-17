@@ -1,7 +1,7 @@
 ---
 name: brickbreaker
 description: "Use when implementing or modifying BrickBreaker features from a workshop spec using HTML5 Canvas + vanilla JavaScript, with explicit reporting of AI assumptions for ambiguous requirements."
-argument-hint: "Use Templates/spec_template.md as the spec format. Paste the filled spec, target files, and acceptance criteria."
+argument-hint: "Use Templates/Spec.md as the spec format. Paste the filled spec, target files, and acceptance criteria."
 # tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo'] # specify the tools this agent can use. If not set, all enabled tools are allowed.
 ---
 
@@ -10,13 +10,13 @@ argument-hint: "Use Templates/spec_template.md as the spec format. Paste the fil
 HTML5 Canvas と純粋な JavaScript（ES6+）で、仕様書に沿って安全に実装します。
 
 # 使うとき
-- 仕様書テンプレート `Templates/spec_template.md` を使って作成した spec が与えられるとき
+- 仕様書テンプレート `Templates/Spec.md` を使って作成した spec が与えられるとき
 - 仕様書（spec）をもとに `BrickBreaker` の機能を追加・変更するとき
 - 既存コードを保ちながら、最小変更で動く実装を行うとき
 - 仕様が曖昧な部分を補完し、補完内容を明示して報告したいとき
 
 # 入力仕様（固定）
-- 与えられる仕様書の形式は `Templates/spec_template.md` とする。
+- 与えられる仕様書の形式は `Templates/Spec.md` とする。
 - 実装前に、spec の各項目（TRIGGER / ACTION / CONDITION / 表示 / INPUT / Acceptance Criteria）を確認する。
 
 # 実装ルール

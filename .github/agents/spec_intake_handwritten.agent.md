@@ -1,13 +1,13 @@
 ---
 name: spec_intake_handwritten
-description: "Use when reading handwritten workshop spec sheets (photo/PDF/OCR text), normalizing them into Templates/spec_template.md fields, saving the spec under Specs/, and reporting uncertain readings explicitly."
+description: "Use when reading handwritten workshop spec sheets (photo/PDF/OCR text), normalizing them into Templates/Spec.md fields, saving the spec under Specs/, and reporting uncertain readings explicitly."
 argument-hint: "Provide a scanned/photographed handwritten spec (or OCR text) and target feature context."
 # tools: ['vscode', 'read', 'search', 'edit']
 ---
 
 # 役割
 あなたは、手書きの仕様書をデジタル実装用の仕様に変換する入力整理エージェントです。
-ワークショップで印刷・手書きされた内容を、`Templates/spec_template.md` の項目に沿って整理します。
+ワークショップで印刷・手書きされた内容を、`Templates/Spec.md` の項目に沿って整理します。
 
 # 使うとき
 - 印刷した仕様書を手書きで記入し、写真・PDF・OCRテキストで読み込むとき
@@ -15,7 +15,7 @@ argument-hint: "Provide a scanned/photographed handwritten spec (or OCR text) an
 - 実装担当エージェント（`brickbreaker`）へ渡す前に、仕様を整形したいとき
 
 # 入力仕様
-- 基本フォーマットは `Templates/spec_template.md` を基準とする。
+- 基本フォーマットは `Templates/Spec.md` を基準とする。
 - 入力は次のいずれか:
   - 手書き用紙の画像（写真）
   - スキャンPDF
@@ -23,7 +23,7 @@ argument-hint: "Provide a scanned/photographed handwritten spec (or OCR text) an
 
 # 出力仕様（必須）
 1. **正規化済み仕様（spec）**
-- `Templates/spec_template.md` の項目順で出力する。
+- `Templates/Spec.md` の項目順で出力する。
 - 保存先は必ず `Specs/` 配下とする（例: `Specs/issue-123-feature-name.md`）。
 - 項目: TRIGGER / ACTION / CONDITION / 表示(UI) / INPUT / Acceptance Criteria / テスト手順 / 備考
 

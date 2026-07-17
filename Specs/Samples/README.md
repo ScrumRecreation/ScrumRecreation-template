@@ -1,6 +1,6 @@
 # Specs/Samples README
 
-このフォルダには、仕様書テンプレート（Templates/spec_template.md）に沿って書かれたサンプルが入っています。
+このフォルダには、仕様書テンプレート（Templates/Spec.md）に沿って書かれたサンプルが入っています。
 
 ## 使い方
 - まず1つ読んで、書き方の流れをつかみます。
