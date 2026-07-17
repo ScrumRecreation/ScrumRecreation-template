@@ -2,7 +2,8 @@
 """Convert a Markdown file to an A4-printable HTML document.
 
 Usage:
-  python3 scripts/markdown_to_a4_html.py README.md Prints/README_print.html
+  python3 scripts/markdown_to_a4_html.py README.md
+  python3 scripts/markdown_to_a4_html.py README.md custom/output.html
 """
 
 from __future__ import annotations
@@ -321,7 +322,7 @@ def build_html(markdown_text: str, source_name: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Convert Markdown to A4-printable HTML")
     parser.add_argument("input", nargs="?", default="README.md", help="Input Markdown file")
-    parser.add_argument("output", nargs="?", default=None, help="Output HTML file")
+    parser.add_argument("output", nargs="?", default=None, help="Output HTML file (default: Prints/<input>_print.html)")
     args = parser.parse_args()
 
     input_path = Path(args.input)
