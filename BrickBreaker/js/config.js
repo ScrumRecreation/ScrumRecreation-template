@@ -3,19 +3,21 @@
 // サーバを介さず file:// で直接開いても動くように、
 // ES Modules ではなく window.BB という名前空間に公開する方式にしている。
 window.BB = window.BB || {};
+const STATIC_LAYOUTS = window.BB.layouts || {};
+
 window.BB.CONFIG = {
   // 画面サイズ
   width: 360, // ゲーム画面の幅
   height: 520, // ゲーム画面の高さ
 
   // パドル設定
-  paddleWidth: 88, // パドルの幅
+  paddleWidth: 76, // パドルの幅
   paddleHeight: 12, // パドルの高さ
-  paddleY: 460, // パドルのY座標
+  paddleY: 476, // パドルのY座標
   paddleSpeed: 7, // キーボード操作時、1フレームで動く距離
 
   // ボール設定
-  ballSize: 8, // ボールのサイズ
+  ballSize: 5, // ボールのサイズ
   ballSpeed: 4, // ボールの初期速度
   ballBoostOnHit: 1.2, // パドルの端に当たったときの反射の強さ
   ballMinHorizontalSpeed: 1.5, // ボールが真上/真下だけに進み続けないための下限速度
@@ -26,6 +28,13 @@ window.BB.CONFIG = {
   brickHeight: 20, // ブロックの高さ
   brickWidth: 46, // ブロックの幅
   brickGap: 10, // ブロック間の隙間
+  brickField: {
+    left: 8,
+    right: 8,
+    top: 40,
+    bottom: 360,
+    minGap: 1
+  },
   blockTypes: {
     A: {
       color: "#ff6b6b", // Aタイプの色
@@ -81,27 +90,21 @@ window.BB.CONFIG = {
       // 後から「このステージだけパドルを短くする」などの調整がしやすくなります。
       difficulty: {
         // パドルの横幅です。広いほどボールを受け止めやすくなります。
-        paddleWidth: 92,
+        paddleWidth: 72,
         // 1フレームでパドルがどれだけ動くかです。大きいほど操作しやすくなります。
-        paddleSpeed: 7,
-        // ボールの基本スピードです。大きいほどブロックを壊しにくくなります。
-        ballSpeed: 4,
+        paddleSpeed: 10,
+        // ボールの基本スピードです。。
+        ballSpeed: 2,
         // パドルに当たったとき、どれだけ強く跳ね返るかを表します。
         // 大きいほど、当たり方で左右の飛び方が大きく変わります。
         ballBoostOnHit: 1.2,
         // ボールが真上や真下だけを行き来しないようにするための下限です。
         ballMinHorizontalSpeed: 1.5
       },
-      // blockLayout は「どこにどの種類のブロックを置くか」を表す表です。
-      // 1行ごとに配列が1つあり、左から右へ並びます。
-      // "A" や "B" は blockTypes で定義したブロックの種類を表し、
-      // "" は「ここには何も置かない」という空きマスです。
-      blockLayout: [
-        ["A", "A", "A", "A", "A", "A"],
-        ["A", "", "A", "A", "", "A"],
-        ["B", "B", "B", "B", "B", "B"],
-        ["A", "A", "A", "A", "A", "A"]
-      ]
+      // blockLayout は layouts.js の静的2次元配列を参照する。
+      // セル値は blockTypes のキー（"A" / "B" など）または ""（空きマス）。
+      // 行数・列数は固定ではなく、createBricks 側で配置サイズを自動調整する。
+      blockLayout: STATIC_LAYOUTS.stage1Heart || []
     },
     /*
       Stage 2 は少しだけ難しくしたステージです。
@@ -112,17 +115,12 @@ window.BB.CONFIG = {
       name: "Lv.2 試練のとき",
       difficulty: {
         paddleWidth: 84,
-        paddleSpeed: 7,
-        ballSpeed: 4.6,
+        paddleSpeed: 9,
+        ballSpeed: 3,
         ballBoostOnHit: 1.25,
         ballMinHorizontalSpeed: 1.7
       },
-      blockLayout: [
-        ["A", "B", "A", "B", "A", "B"],
-        ["A", "", "B", "B", "", "A"],
-        ["B", "A", "A", "A", "A", "B"],
-        ["A", "B", "A", "B", "A", "B"]
-      ]
+      blockLayout: STATIC_LAYOUTS.stage2Star || []
     },
     /*
       Stage 3 は今のところ最後のステージです。
@@ -133,17 +131,12 @@ window.BB.CONFIG = {
       name: "Lv.3 最後の挑戦",
       difficulty: {
         paddleWidth: 76,
-        paddleSpeed: 6,
-        ballSpeed: 5.2,
+        paddleSpeed: 8,
+        ballSpeed: 3.5,
         ballBoostOnHit: 1.3,
         ballMinHorizontalSpeed: 1.9
       },
-      blockLayout: [
-        ["A", "B", "A", "B", "A", "B"],
-        ["B", "A", "B", "A", "B", "A"],
-        ["A", "B", "A", "B", "A", "B"],
-        ["B", "A", "B", "A", "B", "A"]
-      ]
+      blockLayout: STATIC_LAYOUTS.stage3Crown || []
     }
   ], // 現時点で用意している3つのステージ定義
 

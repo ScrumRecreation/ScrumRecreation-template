@@ -59,6 +59,13 @@ function drawBricks(ctx, bricks) {
       continue; // 壊れたブロックは描かずに次のブロックへ
     }
 
+    const isTinyBrick = brick.width * brick.height <= 120;
+    if (isTinyBrick) {
+      ctx.fillStyle = brick.color;
+      ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+      continue;
+    }
+
     ctx.save();
     ctx.shadowBlur = 10;
     ctx.shadowColor = brick.color;

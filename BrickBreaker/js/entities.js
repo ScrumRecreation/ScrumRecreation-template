@@ -45,9 +45,41 @@
   */
   function createBricks(CONFIG, stage) {
     const bricks = [];
-    const startX = 24; // 一番左のブロックのx座標
-    const startY = 70; // 一番上のブロックのy座標
     const layout = stage?.blockLayout || [];
+    const rows = layout.length;
+    if (rows === 0) {
+      return bricks;
+    }
+
+    const cols = layout.reduce((maxCols, row) => Math.max(maxCols, row.length), 0);
+    if (cols === 0) {
+      return bricks;
+    }
+
+    const field = CONFIG.brickField || {};
+    const left = field.left ?? 24;
+    const right = field.right ?? 24;
+    const top = field.top ?? 70;
+    const fallbackBottom = CONFIG.paddleY - 24;
+    const bottom = Math.min(field.bottom ?? fallbackBottom, fallbackBottom);
+    const availableWidth = Math.max(8, CONFIG.width - left - right);
+    const availableHeight = Math.max(8, bottom - top);
+
+    const maxGapByWidth = cols > 1 ? (availableWidth - cols) / (cols - 1) : availableWidth;
+    const maxGapByHeight = rows > 1 ? (availableHeight - rows) / (rows - 1) : availableHeight;
+    const gapLimit = Math.max(0, Math.min(maxGapByWidth, maxGapByHeight));
+    const preferredGap = field.minGap ?? CONFIG.brickGap ?? 0;
+    const gap = Math.min(preferredGap, gapLimit);
+
+    const brickWidth = cols > 0
+      ? (availableWidth - Math.max(0, cols - 1) * gap) / cols
+      : CONFIG.brickWidth;
+    const brickHeight = rows > 0
+      ? (availableHeight - Math.max(0, rows - 1) * gap) / rows
+      : CONFIG.brickHeight;
+
+    const startX = left; // 一番左のブロックのx座標
+    const startY = top; // 一番上のブロックのy座標
 
     for (let row = 0; row < layout.length; row += 1) {       // 上から下へ、行を1つずつ進める
       for (let col = 0; col < layout[row].length; col += 1) { // 左から右へ、列を1つずつ進める
@@ -62,10 +94,10 @@
         }
 
         bricks.push({
-          x: startX + col * (CONFIG.brickWidth + CONFIG.brickGap),  // 列の番号が大きいほど右にずらす
-          y: startY + row * (CONFIG.brickHeight + CONFIG.brickGap), // 行の番号が大きいほど下にずらす
-          width: CONFIG.brickWidth,
-          height: CONFIG.brickHeight,
+          x: startX + col * (brickWidth + gap),  // 列の番号が大きいほど右にずらす
+          y: startY + row * (brickHeight + gap), // 行の番号が大きいほど下にずらす
+          width: brickWidth,
+          height: brickHeight,
           color: blockType.color, // 種類ごとに決めた色を使う
           type: blockTypeKey, // どの種類のブロックかを残しておく
           hitPoints: blockType.hitPoints ?? 1, // 今は1だが、将来の拡張用に持たせておく
