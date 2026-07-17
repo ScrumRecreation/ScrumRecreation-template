@@ -102,8 +102,6 @@ window.BB.CONFIG = {
         ballMinHorizontalSpeed: 1.5
       },
       // blockLayout は layouts.js の静的2次元配列を参照する。
-      // セル値は blockTypes のキー（"A" / "B" など）または ""（空きマス）。
-      // 行数・列数は固定ではなく、createBricks 側で配置サイズを自動調整する。
       blockLayout: STATIC_LAYOUTS.stage1Heart || []
     },
     /*

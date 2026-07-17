@@ -14,8 +14,6 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-STAGE_ORDER = ["stage1Heart", "stage2Star", "stage3Crown"]
-
 HEADER = """// ステージごとのブロックレイアウトを静的データとしてまとめるファイル。
 // 1行を1段として並べた\"テーブル形式\"で、配置をそのまま編集しやすくしている。
 //
@@ -93,15 +91,20 @@ def render_stage(stage_name: str, grid: list[list[str]], is_last: bool) -> str:
     return "\n".join([f"    {stage_name}: [", *row_lines, close])
 
 
-def build_layouts_js(mask_dir: Path) -> str:
-    stages: list[str] = []
-    for index, stage_name in enumerate(STAGE_ORDER):
-        mask_path = mask_dir / f"{stage_name}.txt"
-        if not mask_path.exists():
-            raise FileNotFoundError(f"Missing mask file: {mask_path}")
+def discover_stage_names(mask_dir: Path) -> list[str]:
+    stage_names = sorted(path.stem for path in mask_dir.glob("*.txt") if path.is_file())
+    if not stage_names:
+        raise FileNotFoundError(f"No mask files found in: {mask_dir}")
+    return stage_names
 
+
+def build_layouts_js(mask_dir: Path) -> str:
+    stage_names = discover_stage_names(mask_dir)
+    stages: list[str] = []
+    for index, stage_name in enumerate(stage_names):
+        mask_path = mask_dir / f"{stage_name}.txt"
         grid = parse_mask(mask_path)
-        stages.append(render_stage(stage_name, grid, is_last=(index == len(STAGE_ORDER) - 1)))
+        stages.append(render_stage(stage_name, grid, is_last=(index == len(stage_names) - 1)))
 
     return HEADER + "\n".join(stages) + "\n" + FOOTER
 
