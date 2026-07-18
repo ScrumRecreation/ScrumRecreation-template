@@ -7,7 +7,13 @@
 `js/layouts.js` は次のコマンドで再生成できます。
 
 ```bash
-cd /home/keita/ScrumRecreation
+cd /home/keita/ScrumRecreation-template
+python3 BrickBreaker/scripts/generate_layouts.py
+```
+
+リポジトリルート（`/home/keita/ScrumRecreation-template`）にいる場合は、次でも実行できます。
+
+```bash
 python3 BrickBreaker/scripts/generate_layouts.py
 ```
 
