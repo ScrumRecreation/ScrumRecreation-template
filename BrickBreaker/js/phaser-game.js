@@ -206,7 +206,19 @@
 
       this.cursors = this.input.keyboard.createCursorKeys();
       this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+      this.registerPointerControls();
 
+      // 画面に必要な部品を作ってから、ゲーム状態を初期化する。
+      this.buildWorldObjects();
+      this.resetWholeGame();
+    }
+
+    /*
+      ポインター入力のイベント登録をまとめる関数です。
+      create 内に直接書くよりも、
+      「何を登録しているか」をひとかたまりで把握しやすくなります。
+    */
+    registerPointerControls() {
       // タップ開始: 位置を記録し、ゲーム開始トリガーにも使う。
       this.input.on("pointerdown", (pointer) => {
         this.pointerControlActive = true;
@@ -222,18 +234,21 @@
         this.pointerTargetX = pointer.worldX;
       });
 
-      // 指を離したらポインター制御を無効に戻す。
-      this.input.on("pointerup", () => {
+      // pointerup / pointerupoutside の両方で同じ終了処理にする。
+      const deactivatePointerControl = () => {
         this.pointerControlActive = false;
-      });
+      };
+      this.input.on("pointerup", deactivatePointerControl);
+      this.input.on("pointerupoutside", deactivatePointerControl);
+    }
 
-      this.input.on("pointerupoutside", () => {
-        this.pointerControlActive = false;
-      });
-
-      // 画面に必要な部品を作ってから、ゲーム状態を初期化する。
-      this.buildWorldObjects();
-      this.resetWholeGame();
+    /*
+      ステージ定義を取り出す小さなアクセサ関数です。
+      CONFIG.stages[...] の直接参照を減らし、
+      「ステージを使う」意図をコード上で明確にします。
+    */
+    getStage(stageIndex) {
+      return CONFIG.stages[stageIndex];
     }
 
     /*
@@ -287,7 +302,8 @@
     */
     applyStageDifficulty(stageIndex) {
       // 今のステージの難易度設定を取り出す。
-      this.activeDifficulty = CONFIG.stages[stageIndex].difficulty;
+      const stage = this.getStage(stageIndex);
+      this.activeDifficulty = stage.difficulty;
       // パドル幅だけは見た目と当たり判定の両方を更新する必要がある。
       this.paddle.width = this.activeDifficulty.paddleWidth;
       this.paddle.fillColor = CONFIG.colors.paddle;
@@ -307,7 +323,7 @@
     buildStage(stageIndex) {
       // 前のステージのブロックを全部消す。
       this.bricks.clear(true, true);
-      const stage = CONFIG.stages[stageIndex];
+      const stage = this.getStage(stageIndex);
       this.applyStageDifficulty(stageIndex);
 
       const brickData = createBrickMap(stage);
@@ -420,7 +436,7 @@
       const current = this.stageIndex + 1;
       const total = CONFIG.stages.length;
       stageBadgeEl.textContent = String(current) + " / " + String(total);
-      stageNameEl.textContent = CONFIG.stages[this.stageIndex].name;
+      stageNameEl.textContent = this.getStage(this.stageIndex).name;
       stageProgressEl.style.width = String((current / total) * 100) + "%";
     }
 
@@ -511,7 +527,7 @@
       this.phase = PHASE.READY;
       this.paddle.setPosition(CONFIG.width / 2, CONFIG.paddleY);
       this.buildStage(this.stageIndex);
-      showOverlay(CONFIG.stages[this.stageIndex].name + "\nタップして続ける");
+      showOverlay(this.getStage(this.stageIndex).name + "\nタップして続ける");
     }
 
     /*
