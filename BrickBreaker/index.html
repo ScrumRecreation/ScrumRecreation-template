@@ -38,6 +38,7 @@
               <span id="stageName">準備中</span>
             </div>
           </div>
+          <button id="installBtn" class="install-btn" type="button" hidden>アプリとして保存</button>
         </header>
 
         <!-- 得点と残機を表示する部分です。 -->
@@ -107,6 +108,41 @@
           });
         });
       }
+
+      /*
+        「アプリとして保存」ボタンを最小構成で扱うための処理です。
+        インストール可能なタイミングでイベントを受け取り、ボタン押下で prompt を表示します。
+      */
+      (function () {
+        const installButton = document.getElementById("installBtn");
+        if (!installButton) {
+          return;
+        }
+
+        let deferredInstallPrompt = null;
+
+        window.addEventListener("beforeinstallprompt", function (event) {
+          event.preventDefault();
+          deferredInstallPrompt = event;
+          installButton.hidden = false;
+        });
+
+        installButton.addEventListener("click", async function () {
+          if (!deferredInstallPrompt) {
+            return;
+          }
+
+          deferredInstallPrompt.prompt();
+          await deferredInstallPrompt.userChoice;
+          deferredInstallPrompt = null;
+          installButton.hidden = true;
+        });
+
+        window.addEventListener("appinstalled", function () {
+          deferredInstallPrompt = null;
+          installButton.hidden = true;
+        });
+      })();
     </script>
   </body>
 </html>

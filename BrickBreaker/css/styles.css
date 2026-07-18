@@ -143,6 +143,15 @@ body::after {
   margin-bottom: 14px;
 }
 
+.install-btn {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
 .title-block {
   min-width: 0;
   width: 100%;
