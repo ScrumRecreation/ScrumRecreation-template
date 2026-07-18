@@ -58,6 +58,154 @@
   }
 
   /*
+    効果音（SE）の設定テーブルです。
+    旧実装で使っていた音色・長さ・音量に近い値をここへ集約し、
+    ゲーム本体ロジックからは「名前（start / brickHit など）」で呼べる形にします。
+
+    ポイント:
+    - enabled: SE全体のON/OFF
+    - masterVolume: 全SEに共通でかかる最終音量
+    - tones: 各SEの音色設定（波形/周波数/時間/音量）
+  */
+  const SOUND_CONFIG = {
+    enabled: true,
+    masterVolume: 0.22,
+    tones: {
+      start: { type: "sine", frequency: 660, endFrequency: 990, duration: 0.08, volume: 0.9 },
+      paddleBounce: { type: "triangle", frequency: 300, endFrequency: 380, duration: 0.035, volume: 0.5 },
+      brickHit: { type: "square", frequency: 600, endFrequency: 280, duration: 0.045, volume: 0.55 },
+      lifeLost: { type: "sawtooth", frequency: 180, endFrequency: 95, duration: 0.14, volume: 0.55 },
+      gameOver: { type: "sawtooth", frequency: 150, endFrequency: 75, duration: 0.2, volume: 0.7 },
+      stageClear: { type: "sine", frequency: 523.25, endFrequency: 880, duration: 0.12, volume: 0.7 },
+      win: { type: "sine", frequency: 523.25, endFrequency: 1174.66, duration: 0.22, volume: 0.85 }
+    }
+  };
+
+  /*
+    WebAudioを使ってSEを鳴らす小さなプレイヤーを作る関数です。
+    ブラウザの自動再生制限（ユーザー操作が必要）に対応するため、
+    unlock と play を分けて返します。
+
+    返り値:
+    - unlock(): AudioContextの再開を試みる
+    - play(name): SOUND_CONFIG.tones[name] の音を鳴らす
+  */
+  function createSoundPlayer() {
+    let audioContext = null;
+    let masterGain = null;
+
+    /*
+      AudioContextを遅延初期化で取得する関数です。
+      必要になるまで実体を作らないことで、
+      ページ読み込み直後の不要な初期化を避けます。
+    */
+    function getAudioContext() {
+      if (!SOUND_CONFIG.enabled) {
+        return null;
+      }
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        return null;
+      }
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = SOUND_CONFIG.masterVolume;
+        masterGain.connect(audioContext.destination);
+      }
+      return audioContext;
+    }
+
+    /*
+      ユーザー操作後にAudioContextを再開する関数です。
+      ブラウザが音声開始を許可していない状態（suspended）でだけ resume します。
+    */
+    function unlock() {
+      const context = getAudioContext();
+      if (context && context.state === "suspended") {
+        context.resume().catch(function () {
+          // ブラウザ側で拒否された場合は、次のユーザー操作で再試行する。
+        });
+      }
+    }
+
+    /*
+      1つのトーン設定を実際に鳴らす低レベル関数です。
+      - OscillatorNode: 音程と波形を作る
+      - GainNode: 音量エンベロープ（立ち上がり→減衰）を作る
+
+      ここは「音の生成」だけを担当し、
+      どのSEを鳴らすかの判定は play 側で行います。
+    */
+    function playTone(context, tone) {
+      if (!masterGain) {
+        return;
+      }
+
+      const osc = context.createOscillator();
+      const gain = context.createGain();
+      const now = context.currentTime;
+      const attack = 0.005;
+      const duration = tone.duration;
+      const endTime = now + duration;
+
+      osc.type = tone.type;
+      osc.frequency.setValueAtTime(tone.frequency, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(1, tone.endFrequency), endTime);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(tone.volume, Math.min(endTime, now + attack));
+      gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(now);
+      osc.stop(endTime + 0.01);
+    }
+
+    /*
+      名前付きSEを再生する高レベル関数です。
+      流れ:
+      1) 設定テーブルから tone を引く
+      2) AudioContext を取得する
+      3) suspended なら resume 後に再生
+      4) running なら即再生
+    */
+    function play(name) {
+      const tone = SOUND_CONFIG.tones[name];
+      if (!tone) {
+        return;
+      }
+
+      const context = getAudioContext();
+      if (!context || !masterGain) {
+        return;
+      }
+
+      if (context.state === "suspended") {
+        context.resume().then(function () {
+          playTone(context, tone);
+        }).catch(function () {
+          // resume できない場合は無音で継続する。
+        });
+        return;
+      }
+
+      playTone(context, tone);
+    }
+
+    return { unlock, play };
+  }
+
+  const sfx = createSoundPlayer();
+
+  // ページ上の最初の操作で音声再生が許可されるよう、
+  // 全体入力で unlock を呼んでおく。
+  document.addEventListener("pointerdown", sfx.unlock, { passive: true });
+  document.addEventListener("keydown", sfx.unlock, { passive: true });
+
+  /*
     色指定を Phaser が扱える形式にそろえる関数です。
     - すでに数値ならそのまま使う
     - "0x..." 文字列なら数値へ変換する
@@ -221,6 +369,7 @@
     registerPointerControls() {
       // タップ開始: 位置を記録し、ゲーム開始トリガーにも使う。
       this.input.on("pointerdown", (pointer) => {
+        sfx.unlock();
         this.pointerControlActive = true;
         this.pointerTargetX = pointer.worldX;
         this.activateGame();
@@ -371,6 +520,7 @@
         -this.activeDifficulty.ballSpeed
       );
       this.phase = PHASE.PLAYING;
+      sfx.play("start");
       this.lastBallY = this.ball.y;
       hideOverlay();
     }
@@ -449,6 +599,7 @@
         return;
       }
 
+      sfx.play("paddleBounce");
       this.reflectBallFromPaddle(ball, paddle);
     }
 
@@ -494,6 +645,7 @@
         return;
       }
 
+      sfx.play("brickHit");
       const hp = (brick.getData("hp") || 1) - 1;
       if (hp <= 0) {
         // 壊れたら消して、得点と残り数を更新する。
@@ -519,6 +671,7 @@
     handleStageClear() {
       if (this.isFinalStage()) {
         this.phase = PHASE.WIN;
+        sfx.play("win");
         showOverlay(UI_TEXT.gameWin);
         return;
       }
@@ -527,6 +680,7 @@
       this.phase = PHASE.READY;
       this.paddle.setPosition(CONFIG.width / 2, CONFIG.paddleY);
       this.buildStage(this.stageIndex);
+      sfx.play("stageClear");
       showOverlay(this.getStage(this.stageIndex).name + "\nタップして続ける");
     }
 
@@ -544,11 +698,13 @@
       if (this.lives <= 0) {
         this.phase = PHASE.OVER;
         this.ball.body.setVelocity(0, 0);
+        sfx.play("gameOver");
         showOverlay(UI_TEXT.gameOver);
         return;
       }
 
       this.phase = PHASE.READY;
+      sfx.play("lifeLost");
       this.resetBallToPaddle();
       showOverlay(UI_TEXT.lifeLost);
     }
@@ -647,6 +803,7 @@
 
       // スペースキーを「押した瞬間」だけ開始処理を呼ぶ。
       if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+        sfx.unlock();
         this.activateGame();
       }
 
@@ -702,6 +859,7 @@
 
   // Overlay タップでも開始できるようにしておく。
   overlayEl.addEventListener("pointerdown", function () {
+    sfx.unlock();
     const scene = getSceneInstance();
     if (scene) {
       scene.activateGame();
@@ -710,6 +868,7 @@
 
   // リスタートボタンはいつでも初期化を呼べる。
   restartBtn.addEventListener("click", function () {
+    sfx.unlock();
     const scene = getSceneInstance();
     if (scene) {
       scene.resetWholeGame();
