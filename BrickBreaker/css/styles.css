@@ -314,15 +314,15 @@ body::after {
 }
 
 /*
-  実際の描画先です。
-  display: block を指定して、下に余白が出ないようにしています。
-  touch-action: none を付けることで、タッチ操作時にページが勝手にスクロールされないようにします。
+  実際のゲーム描画先です。
+  ここではサイズ・タッチ操作など「配置/操作」に関する見た目だけを担当し、
+  ゲーム内の背景やオブジェクト描画は JavaScript（Phaser）側で行います。
 */
-canvas {
+#gameCanvas {
   display: block;
   width: 100%;
   height: auto;
-  background: linear-gradient(180deg, #12213d 0%, #0a1022 100%);
+  background: transparent;
   touch-action: none;
   /* 長押しやドレーギでテキスト選択セービーが出ないようにする。 */
   -webkit-user-select: none;
