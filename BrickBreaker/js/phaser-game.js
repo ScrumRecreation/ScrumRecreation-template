@@ -4,8 +4,10 @@
   const BB = window.BB || {};
   const CONFIG = BB.CONFIG;
   const SHARED_CONSTANTS = BB.constants;
+  const RENDERER = BB.renderer;
+  const AUDIO = BB.audio;
 
-  if (!window.Phaser || !CONFIG || !SHARED_CONSTANTS) {
+  if (!window.Phaser || !CONFIG || !SHARED_CONSTANTS || !RENDERER || !AUDIO) {
     return;
   }
 
@@ -57,148 +59,9 @@
     overlayEl.classList.add("hidden");
   }
 
-  /*
-    効果音（SE）の設定テーブルです。
-    旧実装で使っていた音色・長さ・音量に近い値をここへ集約し、
-    ゲーム本体ロジックからは「名前（start / brickHit など）」で呼べる形にします。
-
-    ポイント:
-    - enabled: SE全体のON/OFF
-    - masterVolume: 全SEに共通でかかる最終音量
-    - tones: 各SEの音色設定（波形/周波数/時間/音量）
-  */
-  const SOUND_CONFIG = {
-    enabled: true,
-    masterVolume: 0.22,
-    tones: {
-      start: { type: "sine", frequency: 660, endFrequency: 990, duration: 0.08, volume: 0.9 },
-      paddleBounce: { type: "triangle", frequency: 300, endFrequency: 380, duration: 0.035, volume: 0.5 },
-      brickHit: { type: "square", frequency: 600, endFrequency: 280, duration: 0.045, volume: 0.55 },
-      lifeLost: { type: "sawtooth", frequency: 180, endFrequency: 95, duration: 0.14, volume: 0.55 },
-      gameOver: { type: "sawtooth", frequency: 150, endFrequency: 75, duration: 0.2, volume: 0.7 },
-      stageClear: { type: "sine", frequency: 523.25, endFrequency: 880, duration: 0.12, volume: 0.7 },
-      win: { type: "sine", frequency: 523.25, endFrequency: 1174.66, duration: 0.22, volume: 0.85 }
-    }
-  };
-
-  /*
-    WebAudioを使ってSEを鳴らす小さなプレイヤーを作る関数です。
-    ブラウザの自動再生制限（ユーザー操作が必要）に対応するため、
-    unlock と play を分けて返します。
-
-    返り値:
-    - unlock(): AudioContextの再開を試みる
-    - play(name): SOUND_CONFIG.tones[name] の音を鳴らす
-  */
-  function createSoundPlayer() {
-    let audioContext = null;
-    let masterGain = null;
-
-    /*
-      AudioContextを遅延初期化で取得する関数です。
-      必要になるまで実体を作らないことで、
-      ページ読み込み直後の不要な初期化を避けます。
-    */
-    function getAudioContext() {
-      if (!SOUND_CONFIG.enabled) {
-        return null;
-      }
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) {
-        return null;
-      }
-      if (!audioContext) {
-        audioContext = new AudioContextClass();
-        masterGain = audioContext.createGain();
-        masterGain.gain.value = SOUND_CONFIG.masterVolume;
-        masterGain.connect(audioContext.destination);
-      }
-      return audioContext;
-    }
-
-    /*
-      ユーザー操作後にAudioContextを再開する関数です。
-      ブラウザが音声開始を許可していない状態（suspended）でだけ resume します。
-    */
-    function unlock() {
-      const context = getAudioContext();
-      if (context && context.state === "suspended") {
-        context.resume().catch(function () {
-          // ブラウザ側で拒否された場合は、次のユーザー操作で再試行する。
-        });
-      }
-    }
-
-    /*
-      1つのトーン設定を実際に鳴らす低レベル関数です。
-      - OscillatorNode: 音程と波形を作る
-      - GainNode: 音量エンベロープ（立ち上がり→減衰）を作る
-
-      ここは「音の生成」だけを担当し、
-      どのSEを鳴らすかの判定は play 側で行います。
-    */
-    function playTone(context, tone) {
-      if (!masterGain) {
-        return;
-      }
-
-      const osc = context.createOscillator();
-      const gain = context.createGain();
-      const now = context.currentTime;
-      const attack = 0.005;
-      const duration = tone.duration;
-      const endTime = now + duration;
-
-      osc.type = tone.type;
-      osc.frequency.setValueAtTime(tone.frequency, now);
-      osc.frequency.exponentialRampToValueAtTime(Math.max(1, tone.endFrequency), endTime);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(tone.volume, Math.min(endTime, now + attack));
-      gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      osc.start(now);
-      osc.stop(endTime + 0.01);
-    }
-
-    /*
-      名前付きSEを再生する高レベル関数です。
-      流れ:
-      1) 設定テーブルから tone を引く
-      2) AudioContext を取得する
-      3) suspended なら resume 後に再生
-      4) running なら即再生
-    */
-    function play(name) {
-      const tone = SOUND_CONFIG.tones[name];
-      if (!tone) {
-        return;
-      }
-
-      const context = getAudioContext();
-      if (!context || !masterGain) {
-        return;
-      }
-
-      if (context.state === "suspended") {
-        context.resume().then(function () {
-          playTone(context, tone);
-        }).catch(function () {
-          // resume できない場合は無音で継続する。
-        });
-        return;
-      }
-
-      playTone(context, tone);
-    }
-
-    return { unlock, play };
-  }
-
-  const sfx = createSoundPlayer();
+  // SE は sound.js のプレイヤーを使う。
+  // ゲーム本体は play / unlock 呼び出しだけを担当する。
+  const sfx = AUDIO.createSoundPlayer(CONFIG.sound);
 
   // ページ上の最初の操作で音声再生が許可されるよう、
   // 全体入力で unlock を呼んでおく。
@@ -287,14 +150,21 @@
           continue;
         }
 
-        // rectangle は中心座標で置くので、幅高さの半分を足して位置を作る。
-        const x = left + col * (brickWidth + gap) + brickWidth / 2;
-        const y = top + row * (brickHeight + gap) + brickHeight / 2;
+        // 境界（左/右・上/下）を先に整数へ丸めることで、
+        // 隣接ブロック間の細いにじみ線を減らす。
+        const leftEdge = Math.round(left + col * (brickWidth + gap));
+        const rightEdge = Math.round(left + (col + 1) * brickWidth + col * gap);
+        const topEdge = Math.round(top + row * (brickHeight + gap));
+        const bottomEdge = Math.round(top + (row + 1) * brickHeight + row * gap);
+        const snappedWidth = Math.max(1, rightEdge - leftEdge);
+        const snappedHeight = Math.max(1, bottomEdge - topEdge);
+        const x = leftEdge + snappedWidth / 2;
+        const y = topEdge + snappedHeight / 2;
         bricks.push({
           x: x,
           y: y,
-          width: brickWidth,
-          height: brickHeight,
+          width: snappedWidth,
+          height: snappedHeight,
           color: normalizeColor(type.color),
           score: type.score || TUNING.defaultBrickScore,
           hp: type.hitPoints || TUNING.defaultBrickHp
@@ -320,6 +190,15 @@
       this.paddle = null;
       this.ball = null;
       this.bricks = null;
+
+      // 描画演出用オブジェクト（物理判定は持たない）
+      this.bgOrbs = [];
+      this.bgScanlines = null;
+      this.paddleGlow = null;
+      this.paddleVisual = null;
+      this.ballGlow = null;
+      this.ballSpecular = null;
+      this.brickDecorations = [];
 
       // 入力・難易度
       this.cursors = null;
@@ -355,6 +234,8 @@
       this.cursors = this.input.keyboard.createCursorKeys();
       this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
       this.registerPointerControls();
+      RENDERER.initSceneVisualState(this);
+      RENDERER.createBackgroundLayer(this, CONFIG);
 
       // 画面に必要な部品を作ってから、ゲーム状態を初期化する。
       this.buildWorldObjects();
@@ -409,6 +290,9 @@
       あわせて、ボールがパドル/ブロックに当たったときのコールバックを登録します。
     */
     buildWorldObjects() {
+      RENDERER.ensureGlowTexture(this);
+      RENDERER.ensurePaddleGlowTexture(this);
+
       // add.rectangle は見た目の四角。physics.add.existing で当たり判定を持たせる。
       this.paddle = this.add.rectangle(
         CONFIG.width / 2,
@@ -419,6 +303,12 @@
       );
       // true を渡すと static body（自分では動かず、他を跳ね返す壁のような体）になる。
       this.physics.add.existing(this.paddle, true);
+      this.paddle.setFillStyle(CONFIG.colors.paddle, 0.01);
+
+      this.paddleVisual = RENDERER.createPaddleVisual(this, CONFIG, TUNING, this.paddle);
+
+      // パドル下に発光レイヤーを重ねる。
+      this.paddleGlow = RENDERER.createPaddleGlow(this, CONFIG, this.paddle);
 
       // ボールは円として作る。
       this.ball = this.add.circle(
@@ -435,6 +325,13 @@
       this.ball.body.setCollideWorldBounds(true);
       // 反射係数1 = 速度をほぼそのまま反転させる。
       this.ball.body.setBounce(1, 1);
+
+      // ボール周辺の発光と白いハイライト点。
+      const ballEffects = RENDERER.createBallEffects(this, CONFIG, this.ball);
+      this.ballGlow = ballEffects.ballGlow;
+      this.ballSpecular = ballEffects.ballSpecular;
+
+      RENDERER.syncActorDecorations(this, CONFIG);
 
       // ブロックはまとめて staticGroup で管理する。
       this.bricks = this.physics.add.staticGroup();
@@ -458,6 +355,10 @@
       this.paddle.fillColor = CONFIG.colors.paddle;
       this.paddle.body.setSize(this.activeDifficulty.paddleWidth, CONFIG.paddleHeight, true);
       this.paddle.body.updateFromGameObject();
+
+      if (this.paddleVisual) {
+        this.paddleVisual.setTexture(RENDERER.getPaddleTextureKey(this, CONFIG, this.activeDifficulty.paddleWidth, CONFIG.colors.paddle));
+      }
     }
 
     /*
@@ -471,6 +372,7 @@
     */
     buildStage(stageIndex) {
       // 前のステージのブロックを全部消す。
+      RENDERER.clearBrickDecorations(this);
       this.bricks.clear(true, true);
       const stage = this.getStage(stageIndex);
       this.applyStageDifficulty(stageIndex);
@@ -478,8 +380,11 @@
       const brickData = createBrickMap(stage);
       // 設計図（brickData）をもとに1つずつブロックを置く。
       brickData.forEach((brick) => {
-        const rect = this.add.rectangle(brick.x, brick.y, brick.width, brick.height, brick.color);
+        const rect = this.add.rectangle(brick.x, brick.y, brick.width, brick.height, brick.color, 0.01);
         this.physics.add.existing(rect, true);
+        rect.setDepth(2);
+        RENDERER.decorateBrick(this, CONFIG, rect, brick);
+
         // setData で「耐久」「点数」をブロック自身に持たせる。
         rect.setData("hp", brick.hp);
         rect.setData("score", brick.score);
@@ -499,6 +404,7 @@
     resetBallToPaddle() {
       this.ball.setPosition(this.paddle.x, this.paddle.y - CONFIG.ballRadius - TUNING.ballRestOffsetY);
       this.ball.body.setVelocity(0, 0);
+      RENDERER.syncActorDecorations(this, CONFIG);
       this.lastBallY = this.ball.y;
     }
 
@@ -520,6 +426,7 @@
         -this.activeDifficulty.ballSpeed
       );
       this.phase = PHASE.PLAYING;
+      RENDERER.syncActorDecorations(this, CONFIG);
       sfx.play("start");
       this.lastBallY = this.ball.y;
       hideOverlay();
@@ -652,10 +559,15 @@
         this.remainingBricks -= 1;
         this.score += brick.getData("score") || TUNING.defaultBrickScore;
         this.updateHud();
+
+        RENDERER.destroyBrickDecorations(brick);
+
         brick.destroy();
       } else {
         // まだ壊れない場合は耐久だけ減らす。
         brick.setData("hp", hp);
+
+        RENDERER.flashBrickVisual(this, brick);
       }
 
       if (this.remainingBricks <= 0) {
@@ -800,6 +712,7 @@
     */
     update() {
       this.updatePaddleFromInput();
+      RENDERER.syncActorDecorations(this, CONFIG);
 
       // スペースキーを「押した瞬間」だけ開始処理を呼ぶ。
       if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
@@ -832,7 +745,7 @@
   // Phaser 本体を既存 canvas 要素にマウントする。
   const canvasEl = getRequiredElement("gameCanvas");
   const game = new Phaser.Game({
-    // CANVAS モードで既存 canvas#gameCanvas を使って描画する。
+    // この環境では明示的な render type が必要。
     type: Phaser.CANVAS,
     canvas: canvasEl,
     width: CONFIG.width,

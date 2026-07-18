@@ -127,6 +127,32 @@ window.BB = window.BB || {};
       paddle: 0x74f7ff,
       // ボールの色。
       ball: 0xffe29a
+    },
+
+    // 効果音（SE）の設定。
+    // 実際の再生は sound.js が担当し、ここは値の定義だけを持つ。
+    sound: {
+      // SE 全体を有効化するかどうか。
+      enabled: true,
+      // 最終出力に掛かる共通音量。
+      masterVolume: 0.4,
+      // SE 種類ごとのトーン定義。
+      tones: {
+        // 発射時の上昇音。
+        start: { type: "sine", frequency: 660, endFrequency: 990, duration: 0.08, volume: 0.9 },
+        // パドル反射時の短い反応音。
+        paddleBounce: { type: "triangle", frequency: 300, endFrequency: 380, duration: 0.035, volume: 0.5 },
+        // ブロック命中時の打鍵音。
+        brickHit: { type: "square", frequency: 600, endFrequency: 280, duration: 0.045, volume: 0.55 },
+        // ライフ減少時の下降音。
+        lifeLost: { type: "sawtooth", frequency: 180, endFrequency: 95, duration: 0.14, volume: 0.55 },
+        // ゲームオーバー時の重い下降音。
+        gameOver: { type: "sawtooth", frequency: 150, endFrequency: 75, duration: 0.2, volume: 0.7 },
+        // ステージクリア時の上昇音。
+        stageClear: { type: "sine", frequency: 523.25, endFrequency: 880, duration: 0.12, volume: 0.7 },
+        // 全クリア時の長めの上昇音。
+        win: { type: "sine", frequency: 523.25, endFrequency: 1174.66, duration: 0.22, volume: 0.85 }
+      }
     }
   };
 })();
