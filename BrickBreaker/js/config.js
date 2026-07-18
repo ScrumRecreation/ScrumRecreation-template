@@ -16,9 +16,9 @@ window.BB = window.BB || {};
     // 最初に持っているライフ数。
     initialLives: 3,
     // パドルの高さ。
-    paddleHeight: 12,
+    paddleHeight: 7,
     // パドルの縦位置（画面下に固定するためのY座標）。
-    paddleY: 476,
+    paddleY: 490,
     // ボールの半径。
     ballRadius: 5,
 
