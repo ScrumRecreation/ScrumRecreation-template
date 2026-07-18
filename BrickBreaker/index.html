@@ -11,6 +11,21 @@
     <!-- スマートフォンで見たときに画面サイズに合わせて表示するための設定です。 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>BrickBreaker</title>
+
+    <!-- =============================================
+         PWA 設定
+         ============================================= -->
+    <!-- ブラウザの UI（アドレスバーなど）のテーマカラーをゲームの背景色に合わせます。 -->
+    <meta name="theme-color" content="#060816" />
+    <!-- Web App Manifest: アプリ名・アイコン・起動設定などを定義します。 -->
+    <link rel="manifest" href="manifest.json" />
+    <!-- iOS ホーム画面アイコン（apple-touch-icon）の設定です。 -->
+    <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+    <!-- iOS のステータスバーをダークテーマに合わせます。 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BrickBreaker" />
+
     <!-- 見た目を整える CSS を読み込みます。 -->
     <link rel="stylesheet" href="css/styles.css" />
   </head>
@@ -93,5 +108,25 @@
     <script src="js/render.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/phaser-game.js"></script>
+
+    <!--
+      Service Worker の登録スクリプトです。
+      Service Worker はオフライン対応やキャッシュ管理を担当します。
+      HTTPS または localhost 環境でのみ動作します。
+    -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('./sw.js', { scope: './' })
+            .then((registration) => {
+              console.log('[SW] 登録成功:', registration.scope);
+            })
+            .catch((error) => {
+              console.warn('[SW] 登録失敗:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

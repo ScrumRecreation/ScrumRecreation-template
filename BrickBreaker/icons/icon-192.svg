@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <!-- 背景グラデーション -->
+    <linearGradient id="bg192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#152d55"/>
+      <stop offset="48%" stop-color="#060816"/>
+      <stop offset="100%" stop-color="#050711"/>
+    </linearGradient>
+    <!-- 上部グロー -->
+    <radialGradient id="topGlow192" cx="50%" cy="15%" r="50%">
+      <stop offset="0%" stop-color="#74f7ff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#060816" stop-opacity="0"/>
+    </radialGradient>
+    <!-- ボールグロー -->
+    <radialGradient id="ballGlow192" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#c8feff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#74f7ff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- パドルグラデーション -->
+    <linearGradient id="paddle192" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#74f7ff"/>
+      <stop offset="100%" stop-color="#ffd166"/>
+    </linearGradient>
+    <!-- クリップ（角丸） -->
+    <clipPath id="roundClip192">
+      <rect width="192" height="192" rx="38"/>
+    </clipPath>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="192" height="192" rx="38" fill="url(#bg192)"/>
+  <rect width="192" height="192" rx="38" fill="url(#topGlow192)"/>
+
+  <!-- ブロック行1（シアン） -->
+  <rect x="12" y="30" width="38" height="16" rx="4" fill="#74f7ff"/>
+  <rect x="55" y="30" width="38" height="16" rx="4" fill="#74f7ff" opacity="0.85"/>
+  <rect x="98" y="30" width="38" height="16" rx="4" fill="#74f7ff" opacity="0.7"/>
+  <rect x="141" y="30" width="39" height="16" rx="4" fill="#74f7ff" opacity="0.55"/>
+
+  <!-- ブロック行2（ゴールド） -->
+  <rect x="12" y="51" width="38" height="16" rx="4" fill="#ffd166"/>
+  <rect x="55" y="51" width="38" height="16" rx="4" fill="#ffd166" opacity="0.85"/>
+  <rect x="98" y="51" width="38" height="16" rx="4" fill="#ffd166" opacity="0.7"/>
+  <rect x="141" y="51" width="39" height="16" rx="4" fill="#ffd166" opacity="0.55"/>
+
+  <!-- ブロック行3（グリーン） -->
+  <rect x="12" y="72" width="38" height="16" rx="4" fill="#9df87f"/>
+  <rect x="55" y="72" width="38" height="16" rx="4" fill="#9df87f" opacity="0.85"/>
+  <rect x="98" y="72" width="38" height="16" rx="4" fill="#9df87f" opacity="0.7"/>
+  <rect x="141" y="72" width="39" height="16" rx="4" fill="#9df87f" opacity="0.55"/>
+
+  <!-- ブロック行4（ピンク） -->
+  <rect x="12" y="93" width="38" height="16" rx="4" fill="#ff7eb3"/>
+  <rect x="55" y="93" width="38" height="16" rx="4" fill="#ff7eb3" opacity="0.85"/>
+  <rect x="98" y="93" width="38" height="16" rx="4" fill="#ff7eb3" opacity="0.7"/>
+  <rect x="141" y="93" width="39" height="16" rx="4" fill="#ff7eb3" opacity="0.55"/>
+
+  <!-- ブロックのハイライト（上エッジ） -->
+  <rect x="12" y="30" width="38" height="3" rx="2" fill="white" opacity="0.3"/>
+  <rect x="55" y="30" width="38" height="3" rx="2" fill="white" opacity="0.25"/>
+  <rect x="98" y="30" width="38" height="3" rx="2" fill="white" opacity="0.2"/>
+  <rect x="141" y="30" width="39" height="3" rx="2" fill="white" opacity="0.15"/>
+
+  <!-- ボール軌跡（薄い残像） -->
+  <circle cx="80" cy="142" r="7" fill="#74f7ff" opacity="0.1"/>
+  <circle cx="88" cy="132" r="8" fill="#74f7ff" opacity="0.18"/>
+
+  <!-- ボールグロー -->
+  <circle cx="96" cy="122" r="16" fill="#74f7ff" opacity="0.15"/>
+  <!-- ボール本体 -->
+  <circle cx="96" cy="122" r="10" fill="url(#ballGlow192)"/>
+  <!-- ボール光沢 -->
+  <circle cx="93" cy="119" r="3" fill="white" opacity="0.6"/>
+
+  <!-- パドル -->
+  <rect x="52" y="158" width="88" height="18" rx="9" fill="url(#paddle192)"/>
+  <!-- パドルハイライト -->
+  <rect x="56" y="159" width="80" height="5" rx="3" fill="white" opacity="0.3"/>
+</svg>

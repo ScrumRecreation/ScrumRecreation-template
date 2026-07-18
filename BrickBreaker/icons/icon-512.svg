@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- 背景グラデーション -->
+    <linearGradient id="bg512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#152d55"/>
+      <stop offset="48%" stop-color="#060816"/>
+      <stop offset="100%" stop-color="#050711"/>
+    </linearGradient>
+    <!-- 上部グロー -->
+    <radialGradient id="topGlow512" cx="50%" cy="15%" r="55%">
+      <stop offset="0%" stop-color="#74f7ff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#060816" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 右下グロー -->
+    <radialGradient id="bottomGlow512" cx="80%" cy="85%" r="45%">
+      <stop offset="0%" stop-color="#ffd166" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#060816" stop-opacity="0"/>
+    </radialGradient>
+    <!-- ボールグロー -->
+    <radialGradient id="ballGlow512" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="55%" stop-color="#c8feff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#74f7ff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- パドルグラデーション -->
+    <linearGradient id="paddle512" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#74f7ff"/>
+      <stop offset="50%" stop-color="#9bf1ff"/>
+      <stop offset="100%" stop-color="#ffd166"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="96" fill="url(#bg512)"/>
+  <rect width="512" height="512" rx="96" fill="url(#topGlow512)"/>
+  <rect width="512" height="512" rx="96" fill="url(#bottomGlow512)"/>
+
+  <!-- ===================== -->
+  <!-- ブロック行1（シアン） -->
+  <!-- ===================== -->
+  <!-- 5列 × 幅80px + gap8px = 432px, offset = (512-432)/2 = 40 -->
+  <rect x="40"  y="72"  width="80" height="28" rx="7" fill="#74f7ff"/>
+  <rect x="128" y="72"  width="80" height="28" rx="7" fill="#74f7ff" opacity="0.88"/>
+  <rect x="216" y="72"  width="80" height="28" rx="7" fill="#74f7ff" opacity="0.76"/>
+  <rect x="304" y="72"  width="80" height="28" rx="7" fill="#74f7ff" opacity="0.64"/>
+  <rect x="392" y="72"  width="80" height="28" rx="7" fill="#74f7ff" opacity="0.52"/>
+
+  <!-- ブロック行2（ゴールド） -->
+  <rect x="40"  y="108" width="80" height="28" rx="7" fill="#ffd166"/>
+  <rect x="128" y="108" width="80" height="28" rx="7" fill="#ffd166" opacity="0.88"/>
+  <rect x="216" y="108" width="80" height="28" rx="7" fill="#ffd166" opacity="0.76"/>
+  <rect x="304" y="108" width="80" height="28" rx="7" fill="#ffd166" opacity="0.64"/>
+  <rect x="392" y="108" width="80" height="28" rx="7" fill="#ffd166" opacity="0.52"/>
+
+  <!-- ブロック行3（グリーン） -->
+  <rect x="40"  y="144" width="80" height="28" rx="7" fill="#9df87f"/>
+  <rect x="128" y="144" width="80" height="28" rx="7" fill="#9df87f" opacity="0.88"/>
+  <rect x="216" y="144" width="80" height="28" rx="7" fill="#9df87f" opacity="0.76"/>
+  <rect x="304" y="144" width="80" height="28" rx="7" fill="#9df87f" opacity="0.64"/>
+  <rect x="392" y="144" width="80" height="28" rx="7" fill="#9df87f" opacity="0.52"/>
+
+  <!-- ブロック行4（ピンク） -->
+  <rect x="40"  y="180" width="80" height="28" rx="7" fill="#ff7eb3"/>
+  <rect x="128" y="180" width="80" height="28" rx="7" fill="#ff7eb3" opacity="0.88"/>
+  <rect x="216" y="180" width="80" height="28" rx="7" fill="#ff7eb3" opacity="0.76"/>
+  <rect x="304" y="180" width="80" height="28" rx="7" fill="#ff7eb3" opacity="0.64"/>
+  <rect x="392" y="180" width="80" height="28" rx="7" fill="#ff7eb3" opacity="0.52"/>
+
+  <!-- ブロックのハイライト（上エッジ光沢） -->
+  <rect x="40"  y="72"  width="80" height="6" rx="4" fill="white" opacity="0.28"/>
+  <rect x="40"  y="108" width="80" height="6" rx="4" fill="white" opacity="0.24"/>
+  <rect x="40"  y="144" width="80" height="6" rx="4" fill="white" opacity="0.20"/>
+  <rect x="40"  y="180" width="80" height="6" rx="4" fill="white" opacity="0.16"/>
+
+  <!-- ボール軌跡（薄い残像） -->
+  <circle cx="220" cy="370" r="14" fill="#74f7ff" opacity="0.08"/>
+  <circle cx="236" cy="348" r="17" fill="#74f7ff" opacity="0.12"/>
+  <circle cx="248" cy="330" r="19" fill="#74f7ff" opacity="0.16"/>
+
+  <!-- ボールグロー（外側） -->
+  <circle cx="256" cy="308" r="40" fill="#74f7ff" opacity="0.12"/>
+  <circle cx="256" cy="308" r="28" fill="#74f7ff" opacity="0.18"/>
+  <!-- ボール本体 -->
+  <circle cx="256" cy="308" r="22" fill="url(#ballGlow512)"/>
+  <!-- ボール光沢（ハイライト） -->
+  <circle cx="248" cy="300" r="7" fill="white" opacity="0.65"/>
+  <circle cx="258" cy="296" r="3" fill="white" opacity="0.4"/>
+
+  <!-- パドル（シャドウ） -->
+  <rect x="136" y="432" width="240" height="42" rx="21" fill="#000000" opacity="0.4"/>
+  <!-- パドル本体 -->
+  <rect x="136" y="426" width="240" height="42" rx="21" fill="url(#paddle512)"/>
+  <!-- パドルハイライト -->
+  <rect x="148" y="428" width="216" height="12" rx="8" fill="white" opacity="0.28"/>
+</svg>
