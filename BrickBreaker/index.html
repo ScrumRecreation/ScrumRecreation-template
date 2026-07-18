@@ -27,14 +27,13 @@
       <section class="game-card">
         <header class="game-header">
           <div class="title-block">
-            <p class="eyebrow">WORKSHOP BUILD</p>
             <h1>BrickBreaker</h1>
             <p class="subtitle"></p>
-          </div>
-          <div class="stage-card" aria-live="polite">
-            <span class="stage-label">STAGE</span>
-            <strong id="stageBadge">1 / 3</strong>
-            <span id="stageName">準備中</span>
+            <div class="stage-card" aria-live="polite">
+              <span class="stage-label">STAGE</span>
+              <strong id="stageBadge">1 / 3</strong>
+              <span id="stageName">準備中</span>
+            </div>
           </div>
         </header>
 
@@ -77,26 +76,20 @@
         <!-- 下部の操作説明と再スタートボタンです。 -->
         <div class="controls">
           <p>左右に動かして、ブロックを全部こわそう。</p>
-          <button id="restartBtn" type="button">もう一度チャレンジ</button>
+          <button id="restartBtn" type="button">リトライ</button>
         </div>
       </section>
     </main>
 
     <!--
-      通常の <script> タグで読み込みます（ES Modules は使いません）。
-      file:// で直接開いた場合でも、ブラウザの CORS 制限に
-      引っかからずに動かせるようにするためです。
-      各ファイルは window.BB という名前空間に自分の機能を公開し、
-      あとから読み込むファイルがそれを利用する仕組みなので、
-      読み込む順番（設定 → 部品 → まとめ役）が大切です。
+      Phaser 3 + 通常の <script> タグで読み込みます（ES Modules は使いません）。
+      読み込み順は、Phaser 本体 -> レイアウト -> 設定 -> 共通定数 -> ゲーム本体です。
+      ローカル確認は file:// よりも http:// での起動を推奨します。
     -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
     <script src="js/layouts.js"></script>
     <script src="js/config.js"></script>
-    <script src="js/collision.js"></script>
-    <script src="js/entities.js"></script>
-    <script src="js/render.js"></script>
-    <script src="js/input.js"></script>
-    <script src="js/events.js"></script>
-    <script src="js/game.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/phaser-game.js"></script>
   </body>
 </html>
