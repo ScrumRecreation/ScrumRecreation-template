@@ -115,7 +115,8 @@
     }
 
     // ここから、ブロックをどの範囲に並べるかを計算する。
-    const field = CONFIG.brickField;
+    // brickField はステージごとに定義されている。
+    const field = stage.brickField;
     const left = field.left;
     const right = field.right;
     const top = field.top;

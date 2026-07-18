@@ -22,21 +22,6 @@ window.BB = window.BB || {};
     // ボールの半径。
     ballRadius: 5,
 
-    // ブロック配置可能エリア。
-    // createBrickMap でこの領域内に収まるようサイズを自動計算する。
-    brickField: {
-      // ブロック領域の左端。
-      left: 8,
-      // ブロック領域の右端の余白。
-      right: 8,
-      // ブロック領域の上端。
-      top: 10,
-      // ブロック領域の下端（ただしパドル位置との兼ね合いで内部調整される）。
-      bottom: 300,
-      // ブロック同士の最小すき間。
-      minGap: 1
-    },
-
     // ブロック種類ごとの見た目・耐久・得点。
     // color は 0xRRGGBB 形式（文字列/数値どちらでも可）。
     blockTypes: {
@@ -76,6 +61,19 @@ window.BB = window.BB || {};
           // ほぼ真上移動にならないための横速度の最低値。
           ballMinHorizontalSpeed: 90
         },
+        // ブロック配置可能エリア（createBrickMap がこの領域内に収まるようサイズを自動計算する）。
+        brickField: {
+          // ブロック領域の左端。
+          left: 8,
+          // ブロック領域の右端の余白。
+          right: 8,
+          // ブロック領域の上端。
+          top: 10,
+          // ブロック領域の下端（ただしパドル位置との兼ね合いで内部調整される）。
+          bottom: 300,
+          // ブロック同士の最小すき間。
+          minGap: 1
+        },
         // このステージで使うブロック配置。
         blockLayout: STATIC_LAYOUTS.stage1Heart || []
       },
@@ -94,6 +92,19 @@ window.BB = window.BB || {};
           // ほぼ真上移動にならないための横速度の最低値。
           ballMinHorizontalSpeed: 110
         },
+        // ブロック配置可能エリア（createBrickMap がこの領域内に収まるようサイズを自動計算する）。
+        brickField: {
+          // ブロック領域の左端。
+          left: 8,
+          // ブロック領域の右端の余白。
+          right: 8,
+          // ブロック領域の上端。
+          top: 10,
+          // ブロック領域の下端（ただしパドル位置との兼ね合いで内部調整される）。
+          bottom: 300,
+          // ブロック同士の最小すき間。
+          minGap: 1
+        },
         // このステージで使うブロック配置。
         blockLayout: STATIC_LAYOUTS.stage2Star || []
       },
@@ -111,6 +122,19 @@ window.BB = window.BB || {};
           ballBoostOnHit: 1.3,
           // ほぼ真上移動にならないための横速度の最低値。
           ballMinHorizontalSpeed: 125
+        },
+        // ブロック配置可能エリア（createBrickMap がこの領域内に収まるようサイズを自動計算する）。
+        brickField: {
+          // ブロック領域の左端。
+          left: 8,
+          // ブロック領域の右端の余白。
+          right: 8,
+          // ブロック領域の上端。
+          top: 10,
+          // ブロック領域の下端（ただしパドル位置との兼ね合いで内部調整される）。
+          bottom: 300,
+          // ブロック同士の最小すき間。
+          minGap: 1
         },
         // このステージで使うブロック配置。
         blockLayout: STATIC_LAYOUTS.stage3Crown || []
