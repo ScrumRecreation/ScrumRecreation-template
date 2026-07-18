@@ -209,6 +209,8 @@
       // ポインター操作の状態
       this.pointerControlActive = false;
       this.pointerTargetX = CONFIG.width / 2;
+      this.activeDomPointerId = null;
+      this.pointerDragOffsetX = 0;
 
       // パドル抜けフォールバック判定用
       this.lastBallY = 0;
@@ -249,28 +251,91 @@
       「何を登録しているか」をひとかたまりで把握しやすくなります。
     */
     registerPointerControls() {
+      // ゲーム内 X を操作目標へ反映する。
+      // タップ開始位置で瞬間移動しないよう、パドルとの相対差を維持する。
+      const updatePointerTargetFromWorldX = (worldX) => {
+        this.pointerTargetX = Phaser.Math.Clamp(worldX + this.pointerDragOffsetX, 0, CONFIG.width);
+      };
+
+      // ブラウザ座標 clientX をゲーム内 X 座標へ変換する。
+      // キャンバス外の値も Clamp して端まで追従させる。
+      const updatePointerTargetFromClientX = (clientX) => {
+        const rect = this.game.canvas.getBoundingClientRect();
+        if (!rect.width) {
+          return;
+        }
+        const normalizedX = (clientX - rect.left) / rect.width;
+        updatePointerTargetFromWorldX(normalizedX * CONFIG.width);
+      };
+
       // タップ開始: 位置を記録し、ゲーム開始トリガーにも使う。
       this.input.on("pointerdown", (pointer) => {
         sfx.unlock();
         this.pointerControlActive = true;
-        this.pointerTargetX = pointer.worldX;
+        this.pointerDragOffsetX = this.paddle.x - pointer.worldX;
+        this.pointerTargetX = this.paddle.x;
+        this.activeDomPointerId = pointer.event && typeof pointer.event.pointerId === "number"
+          ? pointer.event.pointerId
+          : null;
         this.activateGame();
       });
 
       // ドラッグ中だけ目標 X を更新する。
       this.input.on("pointermove", (pointer) => {
-        if (!pointer.isDown) {
+        if (!this.pointerControlActive) {
           return;
         }
-        this.pointerTargetX = pointer.worldX;
+        updatePointerTargetFromWorldX(pointer.worldX);
       });
 
       // pointerup / pointerupoutside の両方で同じ終了処理にする。
       const deactivatePointerControl = () => {
         this.pointerControlActive = false;
+        this.activeDomPointerId = null;
+        this.pointerDragOffsetX = 0;
       };
       this.input.on("pointerup", deactivatePointerControl);
       this.input.on("pointerupoutside", deactivatePointerControl);
+
+      // モバイル環境では、キャンバス外へ指が出ると Phaser 側 move が
+      // 途切れるケースがあるため、window イベントで補助追従する。
+      window.addEventListener("pointermove", (event) => {
+        if (!this.pointerControlActive) {
+          return;
+        }
+
+        if (
+          this.activeDomPointerId !== null &&
+          typeof event.pointerId === "number" &&
+          event.pointerId !== this.activeDomPointerId
+        ) {
+          return;
+        }
+
+        updatePointerTargetFromClientX(event.clientX);
+      }, { passive: true });
+
+      window.addEventListener("pointerup", (event) => {
+        if (
+          this.activeDomPointerId !== null &&
+          typeof event.pointerId === "number" &&
+          event.pointerId !== this.activeDomPointerId
+        ) {
+          return;
+        }
+        deactivatePointerControl();
+      }, { passive: true });
+
+      window.addEventListener("pointercancel", (event) => {
+        if (
+          this.activeDomPointerId !== null &&
+          typeof event.pointerId === "number" &&
+          event.pointerId !== this.activeDomPointerId
+        ) {
+          return;
+        }
+        deactivatePointerControl();
+      }, { passive: true });
     }
 
     /*
