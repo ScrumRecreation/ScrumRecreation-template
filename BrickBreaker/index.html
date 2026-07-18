@@ -10,9 +10,12 @@
     <meta charset="UTF-8" />
     <!-- スマートフォンで見たときに画面サイズに合わせて表示するための設定です。 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#1c2541" />
     <title>BrickBreaker</title>
     <!-- 見た目を整える CSS を読み込みます。 -->
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   </head>
   <body>
     <!--
@@ -86,12 +89,24 @@
       読み込み順は、Phaser 本体 -> レイアウト -> 設定 -> 共通定数 -> ゲーム本体です。
       ローカル確認は file:// よりも http:// での起動を推奨します。
     -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+    <script src="libs/phaser.min.js"></script>
     <script src="js/layouts.js"></script>
     <script src="js/config.js"></script>
     <script src="js/constants.js"></script>
     <script src="js/render.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/phaser-game.js"></script>
+    <script>
+      /*
+        対応ブラウザでは Service Worker を登録し、PWA としてオフラインでも起動しやすくします。
+      */
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("./sw.js").catch(function (error) {
+            console.warn("Service Worker registration failed:", error);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
